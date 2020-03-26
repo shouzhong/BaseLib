@@ -7,18 +7,17 @@ import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.shouzhong.base.util.getGenericClass
-import com.shouzhong.base.util.setDialog
+import com.shouzhong.base.util.*
 
 abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity() {
     private var binding: ViewDataBinding? = null
     private var vm: T? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        savedInstanceState?.putParcelable("android:support:fragments", null)
+//        savedInstanceState?.putParcelable("android:support:fragments", null)
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, layoutId)
-        val cls: Class<T> = getGenericClass(this, 0)
+        val cls: Class<T> = getGenericClass( 0)
         binding?.javaClass?.getDeclaredMethod("setVm", cls)?.apply {
             isAccessible = true
             invoke(binding, getVm())
@@ -94,11 +93,11 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
 
     fun getVm(): T {
         if (vm != null) return vm!!
-        val cls: Class<T> = getGenericClass(this, 0)
+        val cls: Class<T> = getGenericClass(0)
         vm = cls.newInstance().apply {
             act = this@BActivity
         }
-        setDialog(this, this)
+        initDialog(this)
         vm?.init()
         return vm!!
     }

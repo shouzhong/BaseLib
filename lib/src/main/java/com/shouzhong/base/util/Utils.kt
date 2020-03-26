@@ -10,27 +10,27 @@ import com.shouzhong.base.dlg.BDialog
 import com.shouzhong.base.dlg.BViewModel
 import java.lang.reflect.ParameterizedType
 
-fun <T> getGenericClass(obj: Any, index: Int): Class<T> {
-    val pt: ParameterizedType = obj.javaClass.genericSuperclass as ParameterizedType
+fun <T> Any.getGenericClass(index: Int): Class<T> {
+    val pt: ParameterizedType = javaClass.genericSuperclass as ParameterizedType
     return pt.actualTypeArguments[index] as Class<T>
 }
 
-fun setDialog(obj: Any, act: AppCompatActivity) {
+fun Any.initDialog(act: AppCompatActivity) {
     val dialogSwitchMap = HashMap<Class<out BDialog<out BViewModel<*>>>, ObservableBoolean>()
     val dialogDataMap = HashMap<Class<out BDialog<out BViewModel<*>>>, Any>()
     val dialogCancelableMap = HashMap<Class<out BDialog<out BViewModel<*>>>, ObservableBoolean>()
-    obj.javaClass.declaredFields?.forEach { field ->
+    javaClass.declaredFields?.forEach { field ->
         field.getAnnotation(DialogSwitch::class.java)?.also {
             field.isAccessible = true
-            dialogSwitchMap[it.value.java] = field.get(obj) as ObservableBoolean
+            dialogSwitchMap[it.value.java] = field.get(this) as ObservableBoolean
         }
         field.getAnnotation(DialogData::class.java)?.also {
             field.isAccessible = true
-            dialogDataMap[it.value.java] = field.get(obj)
+            dialogDataMap[it.value.java] = field.get(this)
         }
         field.getAnnotation(DialogCancelable::class.java)?.also {
             field.isAccessible = true
-            dialogCancelableMap[it.value.java] = field.get(obj) as ObservableBoolean
+            dialogCancelableMap[it.value.java] = field.get(this) as ObservableBoolean
         }
     }
     for((k, v) in dialogSwitchMap) {

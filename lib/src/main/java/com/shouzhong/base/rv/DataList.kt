@@ -4,9 +4,9 @@ import androidx.databinding.ObservableInt
 import com.drakeet.multitype.MultiTypeAdapter
 
 class DataList : ArrayList<Any>() {
-    var adapter: MultiTypeAdapter? = null
-    var isRefresh: Boolean = true
+    val adapter = MultiTypeAdapter(this)
     val length = ObservableInt(size)
+    var isRefresh: Boolean = true
 
     override fun add(element: Any): Boolean {
         add(size, element)
@@ -16,7 +16,7 @@ class DataList : ArrayList<Any>() {
     override fun add(index: Int, element: Any) {
         if (index < 0 || index > size) return
         super.add(index, element)
-        if (isRefresh) adapter?.notifyItemInserted(index)
+        if (isRefresh) adapter.notifyItemInserted(index)
         length.set(size)
     }
 
@@ -27,7 +27,7 @@ class DataList : ArrayList<Any>() {
     override fun addAll(index: Int, elements: Collection<Any>): Boolean {
         if (elements.isEmpty() || index < 0 || index > size) return false
         val boo = super.addAll(index, elements)
-        if (boo && isRefresh) adapter?.notifyItemRangeInserted(index, elements.size)
+        if (boo && isRefresh) adapter.notifyItemRangeInserted(index, elements.size)
         length.set(size)
         return boo
     }
@@ -35,7 +35,7 @@ class DataList : ArrayList<Any>() {
     override fun set(index: Int, element: Any): Any {
         if (index < 0 || index >= size) return element
         val old = super.set(index, element)
-        if (isRefresh) adapter?.notifyItemChanged(index)
+        if (isRefresh) adapter.notifyItemChanged(index)
         return old
     }
 
@@ -49,7 +49,7 @@ class DataList : ArrayList<Any>() {
     override fun removeAt(index: Int): Any {
         if (index < 0 || index >= size) return false
         val old = super.removeAt(index)
-        if (isRefresh) adapter?.notifyItemRemoved(index)
+        if (isRefresh) adapter.notifyItemRemoved(index)
         length.set(size)
         return old
     }
@@ -65,7 +65,7 @@ class DataList : ArrayList<Any>() {
     override fun clear() {
         if (isEmpty()) return
         super.clear()
-        adapter?.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
         length.set(size)
     }
 
@@ -75,7 +75,7 @@ class DataList : ArrayList<Any>() {
         notifyItemChangedAt(index)
     }
 
-    fun notifyItemChangedAt(index: Int) = adapter?.notifyItemChanged(index)
+    fun notifyItemChangedAt(index: Int) = adapter.notifyItemChanged(index)
 
-    fun notifyDataSetChanged() = adapter?.notifyDataSetChanged()
+    fun notifyDataSetChanged() = adapter.notifyDataSetChanged()
 }

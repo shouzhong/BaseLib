@@ -10,7 +10,7 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.shouzhong.base.util.getGenericClass
+import com.shouzhong.base.util.*
 
 abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() {
     private var binding: ViewDataBinding? = null
@@ -45,7 +45,7 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
-        val cls: Class<T> = getGenericClass(this, 0)
+        val cls: Class<T> = getGenericClass(0)
         binding?.javaClass?.getDeclaredMethod("setVm", cls)?.apply {
             isAccessible = true
             invoke(binding, getVm())
@@ -96,9 +96,9 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
 
     fun getVm(): T {
         if (vm != null) return vm!!
-        val cls: Class<T> = getGenericClass(this, 0)
+        val cls: Class<T> = getGenericClass(0)
         vm = cls.newInstance().apply {
-            dialog = this@BDialog
+            dlg = this@BDialog
             setData(this@BDialog.data)
         }
         vm?.init()

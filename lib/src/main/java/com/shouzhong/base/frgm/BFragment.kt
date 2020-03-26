@@ -10,8 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import com.shouzhong.base.util.getGenericClass
-import com.shouzhong.base.util.setDialog
+import com.shouzhong.base.util.*
 
 abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
     private var binding: ViewDataBinding? = null
@@ -31,7 +30,7 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
     ): View? {
         if (binding != null) return binding!!.root
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
-        val cls: Class<T> = getGenericClass(this, 0)
+        val cls: Class<T> = getGenericClass(0)
         binding?.javaClass?.getDeclaredMethod("setVm", cls)?.apply {
             isAccessible = true
             invoke(binding, getVm())
@@ -120,13 +119,12 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
 
     fun getVm(): T {
         if (vm != null) return vm!!
-        val cls: Class<T> = getGenericClass(this, 0)
+        val cls: Class<T> = getGenericClass(0)
         vm = cls.newInstance().apply {
             frgm = this@BFragment
         }
         if (activity is AppCompatActivity) {
-            val act = activity as AppCompatActivity
-            setDialog(this, act)
+            initDialog(activity as AppCompatActivity)
         }
         vm?.init()
         return vm!!

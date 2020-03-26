@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 
 abstract class BViewModel {
-    internal var act: BActivity<*>? = null
+    var act: BActivity<*>? = null
 
     open fun init() = Unit
 
@@ -37,4 +37,9 @@ abstract class BViewModel {
     open fun onSaveInstanceState(outState: Bundle) = Unit
 
     open fun onRestoreInstanceState(savedInstanceState: Bundle) = Unit
+
+    inline fun <reified T : BActivity<*>> getActivity(): T? = when(act) {
+        is T -> act as T
+        else -> null
+    }
 }

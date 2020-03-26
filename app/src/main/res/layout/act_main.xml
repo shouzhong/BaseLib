@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="vm"
+            type="com.shouzhong.base.demo.act.MainViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <com.shouzhong.tablayout.TabLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            app:tabIndicatorMode="text"
+            app:tabIndicatorHeight="2dp"
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabTextColor="#666666"
+            app:tabTextSize="14sp"
+            app:tabSelectedTextColor="@color/colorAccent"
+            tlSetupWithViewPager="@{vp}"/>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/vp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:adapter="@{vm.vpAdapter}"/>
+    </LinearLayout>
+</layout>
