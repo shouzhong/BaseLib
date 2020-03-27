@@ -62,3 +62,26 @@ fun Any.initDialog(act: AppCompatActivity) {
         })
     }
 }
+
+inline fun <reified T> Any.getField(name: String): T? {
+    val field = javaClass.getDeclaredField(name)
+    field.isAccessible = true
+    val result = field.get(this)
+    return when(result) {
+        is T -> result
+        else -> null
+    }
+}
+
+fun Any.setField(name: String, value: Any?) {
+    val field = javaClass.getDeclaredField(name)
+    field.isAccessible = true
+    field.set(this, value)
+}
+
+fun Any.invokeMethod(name: String, vararg parameterTypes: Class<*>, args: Array<Any?>? = null) {
+    val method = javaClass.getDeclaredMethod(name, *parameterTypes)
+    method.isAccessible = true
+    method.invoke(this, args)
+}
+
