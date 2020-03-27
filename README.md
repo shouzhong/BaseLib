@@ -1,7 +1,7 @@
 # BaseLib
 
 ## 混淆
-`
+```
 -keepclassmembers public class * extends androidx.databinding.ViewDataBinding {
     *** setVm(***);
     *** setHolder(***);
@@ -12,4 +12,4 @@
 -keepclassmembernames class kotlinx.** {
     volatile <fields>;
 }
-`
+```
