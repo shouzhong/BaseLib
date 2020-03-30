@@ -3,11 +3,11 @@ package com.shouzhong.base.util
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
-import com.shouzhong.base.annotation.DialogCancelable
-import com.shouzhong.base.annotation.DialogData
-import com.shouzhong.base.annotation.DialogSwitch
+import com.shouzhong.base.annotation.*
 import com.shouzhong.base.dlg.BDialog
 import com.shouzhong.base.dlg.BViewModel
+import com.shouzhong.base.popup.BPopup
+import com.shouzhong.base.popup.BPopupBean
 import java.lang.reflect.ParameterizedType
 
 fun <T> Any.getGenericClass(index: Int): Class<T> {
@@ -63,11 +63,66 @@ fun Any.initDialog(act: AppCompatActivity) {
     }
 }
 
+typealias BPopupViewModel = com.shouzhong.base.popup.BViewModel<out BPopupBean>
+
+fun Any.initPopup(act: AppCompatActivity) {
+    val popupSwitchMap = HashMap<Class<out BPopup<out BPopupViewModel>>, ObservableBoolean>()
+    val popupDataMap = HashMap<Class<out BPopup<out BPopupViewModel>>, BPopupBean>()
+    val popupCancelableMap = HashMap<Class<out BPopup<out BPopupViewModel>>, ObservableBoolean>()
+    javaClass.declaredFields?.forEach { field ->
+        field.getAnnotation(PopupSwitch::class.java)?.also {
+            field.isAccessible = true
+            popupSwitchMap[it.value.java] = field.get(this) as ObservableBoolean
+        }
+        field.getAnnotation(PopupData::class.java)?.also {
+            field.isAccessible = true
+            popupDataMap[it.value.java] = field.get(this) as BPopupBean
+        }
+        field.getAnnotation(PopupCancelable::class.java)?.also {
+            field.isAccessible = true
+            popupCancelableMap[it.value.java] = field.get(this) as ObservableBoolean
+        }
+    }
+    for((k, v) in popupSwitchMap) {
+        v.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                if (v.get()) {
+                    val popup = k.newInstance()
+                    popup.showSwitch = v
+                    popup.data = popupDataMap[k]
+                    popup.isCancelable = popupCancelableMap[k]?.get() ?: true
+                    if (popup.data?.showAsDropDown?.get() == true) {
+                        popup.showAsDropDown(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}", popup.data!!.relatedView.get()!!,
+                            popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                    } else {
+                        popup.showAtLocation(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}", popup.data!!.relatedView.get()!!,
+                            popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                    }
+                } else {
+                    act.supportFragmentManager.findFragmentByTag("${k.name}${popupDataMap[k]?.tag?.get()}")?.also {
+                        val popup = it as BPopup<out BPopupViewModel>
+                        popup.dismiss()
+                    }
+                }
+            }
+        })
+    }
+    for ((k, v) in popupCancelableMap) {
+        v.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                act.supportFragmentManager.findFragmentByTag(k.name)?.also {
+                    val popup = it as BPopup<out BPopupViewModel>
+                    popup.isCancelable = v.get()
+                }
+            }
+        })
+    }
+}
+
 inline fun <reified T> Any.getField(name: String): T? {
     val field = javaClass.getDeclaredField(name)
     field.isAccessible = true
-    val result = field.get(this)
-    return when(result) {
+    return when(val result = field.get(this)) {
         is T -> result
         else -> null
     }

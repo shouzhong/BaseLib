@@ -1,18 +1,32 @@
 package com.shouzhong.base.popup
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.PopupWindow
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 
 open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
-    var cancelable = true
+    var isCancelable = true
         set(value) {
             field = value
-            if (popup != null) popup?.isOutsideTouchable = value
+            popup?.isOutsideTouchable = value
+            popup?.isFocusable = value
+            if (popup?.isShowing == true) popup?.update()
+        }
+    var shadowAlpha = 1f
+        set(value) {
+            field = value
+            if (popup?.isShowing == true) {
+                activity?.window?.attributes = activity?.window?.attributes?.apply {
+                    alpha = field
+                }
+            }
         }
     var popup: PopupWindow? = null
         internal set
@@ -26,12 +40,12 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
     internal var x: Int = 0
     internal var y: Int = 0
 
-
-    fun showAsDropDown(manager: FragmentManager, tag: String, anchor: View, xoff: Int, yoff: Int) {
+    open fun showAsDropDown(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
         this.mDismissed = false
         this.mShownByMe = true
         this.mLocation = false
         this.mView = anchor
+        this.mGravity = gravity
         this.x = xoff
         this.y = yoff
         manager.beginTransaction().run {
@@ -40,7 +54,7 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
         }
     }
 
-    fun showAtLocation(manager: FragmentManager, tag: String, parent: View, gravity: Int, x: Int, y: Int) {
+    open fun showAtLocation(manager: FragmentManager, tag: String, parent: View, gravity: Int, x: Int, y: Int) {
         this.mDismissed = false
         this.mShownByMe = true
         this.mLocation = true
@@ -54,11 +68,11 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
         }
     }
 
-    fun dismiss() {
+    open fun dismiss() {
         dismissInternal(allowStateLoss = false, fromOnDismiss = false)
     }
 
-    fun dismissAllowingStateLoss() {
+    open fun dismissAllowingStateLoss() {
         dismissInternal(allowStateLoss = true, fromOnDismiss = false)
     }
 
@@ -69,7 +83,7 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
         if (popup != null) {
             popup?.setOnDismissListener(null)
             popup?.dismiss()
-            onDismiss()
+            if (!fromOnDismiss) onDismiss()
         }
         mViewDestroyed = true
         requireFragmentManager().beginTransaction().run {
@@ -95,16 +109,23 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
         if (!mViewDestroyed) {
             dismissInternal(allowStateLoss = true, fromOnDismiss = true)
         }
+        activity?.window?.attributes = activity?.window?.attributes?.apply {
+            alpha = 1f
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        check(view != null && view?.parent == null) { "PopupFragment can not be attached to a container view" }
-        popup = PopupWindow()
-        if (view != null) popup?.contentView = view
-        popup?.isOutsideTouchable = cancelable
-        popup?.setOnDismissListener(this)
+        check(view != null && view?.parent == null) { "PopupFragment can not be attached to a empty or container view" }
+        popup = PopupWindow().apply {
+            contentView = view
+            isFocusable = isCancelable
+            width = WindowManager.LayoutParams.WRAP_CONTENT
+            height = WindowManager.LayoutParams.WRAP_CONTENT
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
         initPopup(popup)
+        popup?.setOnDismissListener(this)
     }
 
     override fun onStart() {
@@ -115,6 +136,9 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
                 mLocation -> popup?.showAtLocation(mView, mGravity, x, y)
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT -> popup?.showAsDropDown(mView, x, y, mGravity)
                 else -> popup?.showAsDropDown(mView, x, y)
+            }
+            activity?.window?.attributes = activity?.window?.attributes?.apply {
+                alpha = shadowAlpha
             }
         }
     }
@@ -130,6 +154,11 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
             }
             popup = null
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mView = null
     }
 
     open fun initPopup(popup: PopupWindow?) = Unit

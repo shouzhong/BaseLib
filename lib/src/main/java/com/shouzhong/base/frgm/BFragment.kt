@@ -125,6 +125,7 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         }
         if (activity is AppCompatActivity) {
             initDialog(activity as AppCompatActivity)
+            initPopup(activity as AppCompatActivity)
         }
         vm?.init()
         return vm!!

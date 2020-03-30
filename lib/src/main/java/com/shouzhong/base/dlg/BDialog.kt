@@ -29,6 +29,11 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         showSwitch?.set(false)
     }
 
+    override fun dismissAllowingStateLoss() {
+        super.dismissAllowingStateLoss()
+        showSwitch?.set(false)
+    }
+
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         showSwitch?.set(false)
@@ -63,7 +68,12 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
             initAttributes(attributes)
             dialog?.window?.attributes = attributes
         }
-        getVm().onActivityCreated(savedInstanceState)
+        vm?.onActivityCreated(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        vm?.onSaveInstanceState(outState)
     }
 
     override fun onStart() {
@@ -89,6 +99,7 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
     override fun onDestroyView() {
         super.onDestroyView()
         vm?.onDestroy()
+        vm?.dlg = null
         vm = null
         binding?.unbind()
         binding = null

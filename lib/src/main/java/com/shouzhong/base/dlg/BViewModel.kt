@@ -10,6 +10,8 @@ abstract class BViewModel<T> {
 
     open fun onActivityCreated(savedInstanceState: Bundle?) = Unit
 
+    open fun onSaveInstanceState(outState: Bundle) = Unit
+
     open fun onStart() = Unit
 
     open fun onResume() = Unit

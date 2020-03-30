@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -98,6 +99,7 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
             act = this@BActivity
         }
         initDialog(this)
+        initPopup(this)
         vm?.init()
         return vm!!
     }

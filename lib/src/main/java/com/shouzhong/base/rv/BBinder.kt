@@ -20,6 +20,7 @@ open class BBinder<T, VH : BHolder<T>>(val layoutId: Int) : ItemViewBinder<T, VH
         }
         if (inflater.context is AppCompatActivity) {
             holder.initDialog(inflater.context as AppCompatActivity)
+            holder.initPopup(inflater.context as AppCompatActivity)
         }
         return holder
     }
