@@ -1,6 +1,5 @@
 package com.shouzhong.base.demo.frgm
 
-import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.demo.R
 import com.shouzhong.base.demo.rv.TestBinder1
 import com.shouzhong.base.frgm.BFragment

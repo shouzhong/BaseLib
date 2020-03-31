@@ -21,25 +21,5 @@
             android:textSize="16sp"
             tools:text="第n项"
             android:text="@{`第`+holder.data+`项`}"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="80dp"
-            android:layout_centerInParent="true"
-            android:textColor="#ff00ff"
-            android:textSize="16sp"
-            android:text="dialog"
-            android:onClick="@{holder::onClickDialog}"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_centerInParent="true"
-            android:textColor="#ff00ff"
-            android:textSize="16sp"
-            android:text="popup"
-            android:onClick="@{holder::onClickPopup}"/>
     </LinearLayout>
 </layout>

@@ -8,6 +8,7 @@ import com.shouzhong.base.dlg.BDialog
 import com.shouzhong.base.dlg.BViewModel
 import com.shouzhong.base.popup.BPopup
 import com.shouzhong.base.popup.BPopupBean
+import com.shouzhong.base.popup.PopupFragment
 import java.lang.reflect.ParameterizedType
 
 fun <T> Any.getGenericClass(index: Int): Class<T> {
@@ -91,12 +92,20 @@ fun Any.initPopup(act: AppCompatActivity) {
                     popup.showSwitch = v
                     popup.data = popupDataMap[k]
                     popup.isCancelable = popupCancelableMap[k]?.get() ?: true
-                    if (popup.data?.showAsDropDown?.get() == true) {
-                        popup.showAsDropDown(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}", popup.data!!.relatedView.get()!!,
-                            popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
-                    } else {
-                        popup.showAtLocation(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}", popup.data!!.relatedView.get()!!,
-                            popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                    when(popup.data?.showStyle?.get()) {
+                        PopupFragment.SHOW_STYLE_DROP_DOWN -> popup.showAsDropDown(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}",
+                            popup.data!!.relatedView.get()!!, popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                        PopupFragment.SHOW_STYLE_LOCATION -> popup.showAtLocation(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}",
+                            popup.data!!.relatedView.get()!!, popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                        PopupFragment.SHOW_STYLE_TOP -> popup.showOnTop(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}",
+                            popup.data!!.relatedView.get()!!, popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                        PopupFragment.SHOW_STYLE_LEFT -> popup.showOnLeft(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}",
+                            popup.data!!.relatedView.get()!!, popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                        PopupFragment.SHOW_STYLE_RIGHT -> popup.showOnRight(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}",
+                            popup.data!!.relatedView.get()!!, popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                        PopupFragment.SHOW_STYLE_BOTTOM -> popup.showOnBottom(act.supportFragmentManager, "${k.name}${popup.data?.tag?.get()}",
+                            popup.data!!.relatedView.get()!!, popup.data!!.gravity.get(), popup.data!!.x.get(), popup.data!!.y.get())
+                        else -> throw IllegalArgumentException("show style does not exit")
                     }
                 } else {
                     act.supportFragmentManager.findFragmentByTag("${k.name}${popupDataMap[k]?.tag?.get()}")?.also {
