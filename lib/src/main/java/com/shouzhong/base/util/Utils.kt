@@ -1,19 +1,39 @@
 package com.shouzhong.base.util
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
+import androidx.fragment.app.Fragment
 import com.shouzhong.base.annotation.*
 import com.shouzhong.base.dlg.BDialog
 import com.shouzhong.base.dlg.BViewModel
 import com.shouzhong.base.popup.BPopup
 import com.shouzhong.base.popup.BPopupBean
 import com.shouzhong.base.popup.PopupFragment
+import com.shouzhong.request.Request
 import java.lang.reflect.ParameterizedType
 
 fun <T> Any.getGenericClass(index: Int): Class<T> {
     val pt: ParameterizedType = javaClass.genericSuperclass as ParameterizedType
     return pt.actualTypeArguments[index] as Class<T>
+}
+
+fun Activity.startActivity(intent: Intent, callback: ((Int, Intent?) -> Unit)) {
+    Request().apply {
+        with(this@startActivity)
+        setIntent(intent)
+        setCallback(callback)
+    }.start()
+}
+
+fun Fragment.startActivity(intent: Intent, callback: ((Int, Intent?) -> Unit)) {
+    Request().apply {
+        with(this@startActivity.activity)
+        setIntent(intent)
+        setCallback(callback)
+    }.start()
 }
 
 fun Any.initDialog(act: AppCompatActivity) {

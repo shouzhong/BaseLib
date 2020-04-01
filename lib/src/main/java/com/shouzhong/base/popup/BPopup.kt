@@ -11,34 +11,23 @@ import androidx.fragment.app.FragmentManager
 import com.shouzhong.base.util.getGenericClass
 
 open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
-    private var binding: ViewDataBinding? = null
+    var binding: ViewDataBinding? = null
+        private set
     private var vm: T? = null
 
     var showSwitch: ObservableBoolean? = null
     var data: BPopupBean? = null
 
-    override fun showAsDropDown(
+    override fun show(
         manager: FragmentManager,
         tag: String,
-        anchor: View,
+        showStyle: String,
+        view: View,
         gravity: Int,
         xoff: Int,
         yoff: Int
     ) {
-        super.showAsDropDown(manager, tag, anchor, gravity, xoff, yoff)
-        shadowAlpha = data?.shadowAlpha?.get() ?: 1f
-        showSwitch?.set(true)
-    }
-
-    override fun showAtLocation(
-        manager: FragmentManager,
-        tag: String,
-        parent: View,
-        gravity: Int,
-        x: Int,
-        y: Int
-    ) {
-        super.showAtLocation(manager, tag, parent, gravity, x, y)
+        super.show(manager, tag, showStyle, view, gravity, xoff, yoff)
         shadowAlpha = data?.shadowAlpha?.get() ?: 1f
         showSwitch?.set(true)
     }

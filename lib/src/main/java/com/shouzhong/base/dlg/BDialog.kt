@@ -13,7 +13,8 @@ import androidx.fragment.app.FragmentManager
 import com.shouzhong.base.util.*
 
 abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() {
-    private var binding: ViewDataBinding? = null
+    var binding: ViewDataBinding? = null
+        private set
     private var vm: T? = null
 
     var showSwitch: ObservableBoolean? = null
@@ -62,12 +63,10 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
         super.onActivityCreated(savedInstanceState)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        view?.post {
-            val attributes = dialog?.window?.attributes
-            attributes?.gravity = Gravity.CENTER
-            initAttributes(attributes)
-            dialog?.window?.attributes = attributes
-        }
+        val attributes = dialog?.window?.attributes
+        attributes?.gravity = Gravity.CENTER
+        initAttributes(attributes)
+        dialog?.window?.attributes = attributes
         vm?.onActivityCreated(savedInstanceState)
     }
 

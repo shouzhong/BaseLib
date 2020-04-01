@@ -50,84 +50,38 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
     internal var x: Int = 0
     internal var y: Int = 0
 
-    open fun showAsDropDown(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
-        this.showStyle = SHOW_STYLE_DROP_DOWN
-        this.mDismissed = false
-        this.mShownByMe = true
-        this.mView = anchor
-        this.mGravity = gravity
-        this.x = xoff
-        this.y = yoff
-        manager.beginTransaction().run {
-            add(this@PopupFragment, tag)
-            commit()
-        }
+    fun showAsDropDown(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
+        show(manager, tag, SHOW_STYLE_DROP_DOWN, anchor, gravity, xoff, yoff)
     }
 
-    open fun showAtLocation(manager: FragmentManager, tag: String, parent: View, gravity: Int, x: Int, y: Int) {
-        this.showStyle = SHOW_STYLE_LOCATION
+    fun showAtLocation(manager: FragmentManager, tag: String, parent: View, gravity: Int, x: Int, y: Int) {
+        show(manager, tag, SHOW_STYLE_LOCATION, parent, gravity, x, y)
+    }
+
+    fun showOnTop(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
+        show(manager, tag, SHOW_STYLE_TOP, anchor, gravity, xoff, yoff)
+    }
+
+    fun showOnBottom(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
+        show(manager, tag, SHOW_STYLE_BOTTOM, anchor, gravity, xoff, yoff)
+    }
+
+    fun showOnLeft(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
+        show(manager, tag, SHOW_STYLE_LEFT, anchor, gravity, xoff, yoff)
+    }
+
+    fun showOnRight(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
+        show(manager, tag, SHOW_STYLE_RIGHT, anchor, gravity, xoff, yoff)
+    }
+
+    internal open fun show(manager: FragmentManager, tag: String, showStyle: String, view: View, gravity: Int, x: Int, y: Int) {
+        this.showStyle = showStyle
         this.mDismissed = false
         this.mShownByMe = true
-        this.mView = parent
+        this.mView = view
         this.mGravity = gravity
         this.x = x
         this.y = y
-        manager.beginTransaction().run {
-            add(this@PopupFragment, tag)
-            commit()
-        }
-    }
-
-    open fun showOnTop(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
-        this.showStyle = SHOW_STYLE_TOP
-        this.mDismissed = false
-        this.mShownByMe = true
-        this.mView = anchor
-        this.mGravity = gravity
-        this.x = xoff
-        this.y = yoff
-        manager.beginTransaction().run {
-            add(this@PopupFragment, tag)
-            commit()
-        }
-    }
-
-    open fun showOnBottom(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
-        this.showStyle = SHOW_STYLE_BOTTOM
-        this.mDismissed = false
-        this.mShownByMe = true
-        this.mView = anchor
-        this.mGravity = gravity
-        this.x = xoff
-        this.y = yoff
-        manager.beginTransaction().run {
-            add(this@PopupFragment, tag)
-            commit()
-        }
-    }
-
-    open fun showOnLeft(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
-        this.showStyle = SHOW_STYLE_LEFT
-        this.mDismissed = false
-        this.mShownByMe = true
-        this.mView = anchor
-        this.mGravity = gravity
-        this.x = xoff
-        this.y = yoff
-        manager.beginTransaction().run {
-            add(this@PopupFragment, tag)
-            commit()
-        }
-    }
-
-    open fun showOnRight(manager: FragmentManager, tag: String, anchor: View, gravity: Int, xoff: Int, yoff: Int) {
-        this.showStyle = SHOW_STYLE_RIGHT
-        this.mDismissed = false
-        this.mShownByMe = true
-        this.mView = anchor
-        this.mGravity = gravity
-        this.x = xoff
-        this.y = yoff
         manager.beginTransaction().run {
             add(this@PopupFragment, tag)
             commit()
@@ -209,7 +163,7 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
                     mView?.getLocationOnScreen(location)
                     popup?.contentView?.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                     val popupWidth = popup?.contentView?.measuredWidth ?: 0
-                    val popopHeight = popup?.contentView?.measuredHeight ?: 0
+                    val popupHeight = popup?.contentView?.measuredHeight ?: 0
                     val viewWidth = mView?.measuredWidth ?: 0
                     val viewHeight = mView?.measuredHeight ?: 0
                     val tempx = if (showStyle == SHOW_STYLE_TOP || showStyle == SHOW_STYLE_BOTTOM) {
@@ -227,15 +181,15 @@ open class PopupFragment : Fragment(), PopupWindow.OnDismissListener {
                     else 0
                     val tempy = if (showStyle == SHOW_STYLE_LEFT || showStyle == SHOW_STYLE_RIGHT) {
                         when (mGravity) {
-                            Gravity.START -> location[1] - popopHeight
+                            Gravity.START -> location[1] - popupHeight
                             Gravity.TOP -> location[1]
-                            Gravity.CENTER -> location[1] + (viewHeight - popopHeight) / 2
-                            Gravity.BOTTOM -> location[1] + (viewHeight - popopHeight)
+                            Gravity.CENTER -> location[1] + (viewHeight - popupHeight) / 2
+                            Gravity.BOTTOM -> location[1] + (viewHeight - popupHeight)
                             Gravity.END -> location[1] + viewHeight
                             else -> 0
                         }
                     }
-                    else if (showStyle == SHOW_STYLE_TOP) location[1] - popopHeight
+                    else if (showStyle == SHOW_STYLE_TOP) location[1] - popupHeight
                     else if (showStyle == SHOW_STYLE_BOTTOM) location[1] + viewHeight
                     else 0
                     popup?.showAtLocation(mView, Gravity.NO_GRAVITY, tempx + x, tempy + y)

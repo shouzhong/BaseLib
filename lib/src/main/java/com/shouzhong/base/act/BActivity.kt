@@ -4,14 +4,16 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.shouzhong.base.util.*
+import com.shouzhong.base.util.getGenericClass
+import com.shouzhong.base.util.initDialog
+import com.shouzhong.base.util.initPopup
 
 abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity() {
-    private var binding: ViewDataBinding? = null
+    var binding: ViewDataBinding? = null
+        private set
     private var vm: T? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,8 +100,8 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
         vm = cls.newInstance().apply {
             act = this@BActivity
         }
-        initDialog(this)
-        initPopup(this)
+        vm?.initDialog(this)
+        vm?.initPopup(this)
         vm?.init()
         return vm!!
     }

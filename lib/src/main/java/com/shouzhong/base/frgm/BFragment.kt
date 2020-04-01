@@ -13,7 +13,8 @@ import androidx.fragment.app.Fragment
 import com.shouzhong.base.util.*
 
 abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
-    private var binding: ViewDataBinding? = null
+    var binding: ViewDataBinding? = null
+        private set
     private var vm: T? = null
     private var isFirst = false
     private var isFirstVisible = false
@@ -124,8 +125,8 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
             frgm = this@BFragment
         }
         if (activity is AppCompatActivity) {
-            initDialog(activity as AppCompatActivity)
-            initPopup(activity as AppCompatActivity)
+            vm?.initDialog(activity as AppCompatActivity)
+            vm?.initPopup(activity as AppCompatActivity)
         }
         vm?.init()
         return vm!!

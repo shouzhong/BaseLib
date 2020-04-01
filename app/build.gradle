@@ -22,7 +22,6 @@ android {
 
 dependencies {
     implementation project(":lib")
-    implementation 'com.shouzhong:TabLayout:1.0.2'
     implementation 'com.blankj:utilcodex:1.26.0'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:2.0"
 }
