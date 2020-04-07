@@ -15,9 +15,13 @@ import com.shouzhong.base.popup.PopupFragment
 import com.shouzhong.request.Request
 import java.lang.reflect.ParameterizedType
 
-fun <T> Any.getGenericClass(index: Int): Class<T> {
+fun <T> Any.getGenericClass(index: Int): Class<T>? {
     val pt: ParameterizedType = javaClass.genericSuperclass as ParameterizedType
-    return pt.actualTypeArguments[index] as Class<T>
+    return try {
+        pt.actualTypeArguments[index] as Class<T>
+    } catch (e: Throwable) {
+        null
+    }
 }
 
 fun Activity.startActivity(intent: Intent, callback: ((Int, Intent?) -> Unit)) {
@@ -58,6 +62,7 @@ fun Any.initDialog(act: AppCompatActivity) {
         v.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 if (v.get()) {
+                    if (act.supportFragmentManager.findFragmentByTag(k.name) != null) return
                     val dialog = k.newInstance()
                     dialog.showSwitch = v
                     dialog.data = dialogDataMap[k]
@@ -108,6 +113,7 @@ fun Any.initPopup(act: AppCompatActivity) {
         v.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 if (v.get()) {
+                    if (act.supportFragmentManager.findFragmentByTag("${k.name}${popupDataMap[k]?.tag?.get()}") != null) return
                     val popup = k.newInstance()
                     popup.showSwitch = v
                     popup.data = popupDataMap[k]
@@ -148,7 +154,7 @@ fun Any.initPopup(act: AppCompatActivity) {
     }
 }
 
-inline fun <reified T> Any.getField(name: String): T? {
+inline fun <reified T> Any.getFieldValue(name: String): T? {
     val field = javaClass.getDeclaredField(name)
     field.isAccessible = true
     return when(val result = field.get(this)) {
@@ -157,7 +163,7 @@ inline fun <reified T> Any.getField(name: String): T? {
     }
 }
 
-fun Any.setField(name: String, value: Any?) {
+fun Any.setFieldValue(name: String, value: Any?) {
     val field = javaClass.getDeclaredField(name)
     field.isAccessible = true
     field.set(this, value)

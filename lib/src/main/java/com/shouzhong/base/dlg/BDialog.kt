@@ -51,8 +51,7 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
-        val cls: Class<T> = getGenericClass(0)
-        binding?.javaClass?.getDeclaredMethod("setVm", cls)?.apply {
+        binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
             isAccessible = true
             invoke(binding, getVm())
         }
@@ -106,8 +105,7 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
 
     fun getVm(): T {
         if (vm != null) return vm!!
-        val cls: Class<T> = getGenericClass(0)
-        vm = cls.newInstance().apply {
+        vm = getGenericClass<T>(0)?.newInstance()?.apply {
             dlg = this@BDialog
             setData(this@BDialog.data)
         }

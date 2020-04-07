@@ -56,8 +56,7 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
-        val cls: Class<T> = getGenericClass(0)
-        binding?.javaClass?.getDeclaredMethod("setVm", cls)?.apply {
+        binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
             isAccessible = true
             invoke(binding, getVm())
         }
@@ -105,8 +104,7 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
 
     fun getVm(): T {
         if (vm != null) return vm!!
-        val cls: Class<T> = getGenericClass(0)
-        vm = cls.newInstance().apply {
+        vm = getGenericClass<T>(0)?.newInstance()?.apply {
             popup = this@BPopup
             setData(this@BPopup.data)
         }

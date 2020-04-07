@@ -20,8 +20,7 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
 //        savedInstanceState?.putParcelable("android:support:fragments", null)
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, layoutId)
-        val cls: Class<T> = getGenericClass( 0)
-        binding?.javaClass?.getDeclaredMethod("setVm", cls)?.apply {
+        binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>( 0))?.apply {
             isAccessible = true
             invoke(binding, getVm())
         }
@@ -96,8 +95,7 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
 
     fun getVm(): T {
         if (vm != null) return vm!!
-        val cls: Class<T> = getGenericClass(0)
-        vm = cls.newInstance().apply {
+        vm = getGenericClass<T>(0)?.newInstance()?.apply {
             act = this@BActivity
         }
         vm?.initDialog(this)
