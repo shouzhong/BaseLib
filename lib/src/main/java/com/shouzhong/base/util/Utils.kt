@@ -1,7 +1,12 @@
 package com.shouzhong.base.util
 
 import android.app.Activity
+import android.app.Application
 import android.content.Intent
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
@@ -14,6 +19,20 @@ import com.shouzhong.base.popup.BPopupBean
 import com.shouzhong.base.popup.PopupFragment
 import com.shouzhong.request.Request
 import java.lang.reflect.ParameterizedType
+
+private var app: Application? = null
+
+fun getApp(): Application? {
+    if (app != null) return app
+    app = try {
+        Class.forName("android.app.ActivityThread").let {
+            it.getDeclaredMethod("getApplication").invoke(it.getDeclaredMethod("currentActivityThread").invoke(null))
+        } as Application
+    } catch (e: Throwable) {
+        null
+    }
+    return app
+}
 
 fun <T> Any.getGenericClass(index: Int): Class<T>? {
     val pt: ParameterizedType = javaClass.genericSuperclass as ParameterizedType
@@ -39,6 +58,16 @@ fun Fragment.startActivity(intent: Intent, callback: ((Int, Intent?) -> Unit)) {
         setCallback(callback)
     }.start()
 }
+
+/**
+ * View黑白化
+ *
+ */
+fun View.gray() = setLayerType(View.LAYER_TYPE_HARDWARE, Paint().apply {
+    colorFilter = ColorMatrixColorFilter(ColorMatrix().apply {
+        setSaturation(0f)
+    })
+})
 
 fun Any.initDialog(act: AppCompatActivity) {
     val dialogSwitchMap = HashMap<Class<out BDialog<out BViewModel<*>>>, ObservableBoolean>()
@@ -152,26 +181,5 @@ fun Any.initPopup(act: AppCompatActivity) {
             }
         })
     }
-}
-
-inline fun <reified T> Any.getFieldValue(name: String): T? {
-    val field = javaClass.getDeclaredField(name)
-    field.isAccessible = true
-    return when(val result = field.get(this)) {
-        is T -> result
-        else -> null
-    }
-}
-
-fun Any.setFieldValue(name: String, value: Any?) {
-    val field = javaClass.getDeclaredField(name)
-    field.isAccessible = true
-    field.set(this, value)
-}
-
-fun Any.invokeMethod(name: String, vararg parameterTypes: Class<*>, args: Array<Any?>? = null) {
-    val method = javaClass.getDeclaredMethod(name, *parameterTypes)
-    method.isAccessible = true
-    method.invoke(this, args)
 }
 

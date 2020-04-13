@@ -95,6 +95,7 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
     }
 
     override fun onDestroyView() {
+        dialog?.setOnCancelListener(null)
         super.onDestroyView()
         vm?.onDestroy()
         vm?.dlg = null
