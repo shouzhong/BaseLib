@@ -41,7 +41,7 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (!isFirst) {
             isFirst = true
-            if (userVisibleHint) {
+            if (userVisibleHint && !isHidden) {
                 if (!isFirstVisible) {
                     isFirstVisible = true
                     getVm().onFragmentFirstVisible()
@@ -115,6 +115,16 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
             getVm().onFragmentFirstVisible()
         }
         vm?.onFragmentVisibleChange(isVisibleToUser)
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!isFirst) return
+        if (!isFirstVisible && !hidden) {
+            isFirstVisible = true
+            getVm().onFragmentFirstVisible()
+        }
+        vm?.onFragmentVisibleChange(!hidden)
     }
 
     fun getVm(): T {

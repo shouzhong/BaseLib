@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
+import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.Observable
@@ -58,6 +59,14 @@ fun Fragment.startActivity(intent: Intent, callback: ((Int, Intent?) -> Unit)) {
         setCallback(callback)
     }.start()
 }
+
+fun Int.resToColor(): Int = getApp()!!.resources!!.getColor(this)
+
+fun Int.resToDrawable(): Drawable = getApp()!!.resources!!.getDrawable(this)
+
+fun Int.resToDimension(): Float = getApp()!!.resources!!.getDimension(this)
+
+fun Int.resToString(): String = getApp()!!.resources!!.getString(this)
 
 /**
  * View黑白化
