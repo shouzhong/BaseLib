@@ -2,6 +2,7 @@ package com.shouzhong.base.util
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -11,7 +12,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
-import androidx.fragment.app.Fragment
 import com.shouzhong.base.annotation.*
 import com.shouzhong.base.dlg.BDialog
 import com.shouzhong.base.dlg.BViewModel
@@ -19,20 +19,92 @@ import com.shouzhong.base.popup.BPopup
 import com.shouzhong.base.popup.BPopupBean
 import com.shouzhong.base.popup.PopupFragment
 import com.shouzhong.request.Request
+import java.lang.ref.WeakReference
 import java.lang.reflect.ParameterizedType
 
-private var app: Application? = null
+private var bApp: Application? = null
 
 fun getApp(): Application? {
-    if (app != null) return app
-    app = try {
+    if (bApp != null) return bApp
+    bApp = try {
         Class.forName("android.app.ActivityThread").let {
             it.getDeclaredMethod("getApplication").invoke(it.getDeclaredMethod("currentActivityThread").invoke(null))
         } as Application
     } catch (e: Throwable) {
         null
     }
-    return app
+    return bApp
+}
+
+/**
+ * 获取顶层Activity，如果在onCreate中调用，将不是当前activity
+ * 如果反射不好用 ，请尝试使用https://github.com/tiann/FreeReflection
+ *
+ */
+fun getTopActivity(): Activity? {
+    try {
+        val activityThreadClass = Class.forName("android.app.ActivityThread")
+        val currentActivityThreadMethod = activityThreadClass.getMethod("currentActivityThread").invoke(null)
+        val mActivityListField = activityThreadClass.getDeclaredField("mActivities")
+        mActivityListField.isAccessible = true
+        val activities = mActivityListField.get(currentActivityThreadMethod) as Map<*, *>
+        val last = activities.values.last()!!
+        val activityField = last.javaClass.getDeclaredField("activity")
+        activityField.isAccessible = true
+        return activityField.get(last) as Activity
+//        for (activityRecord in activities.values) {
+//            val activityRecordClass = activityRecord!!.javaClass
+//            val pausedField = activityRecordClass.getDeclaredField("paused")
+//            pausedField.isAccessible = true
+//            if (!pausedField.getBoolean(activityRecord)) {
+//                val activityField = activityRecordClass.getDeclaredField("activity")
+//                activityField.isAccessible = true
+//                return activityField.get(activityRecord) as Activity
+//            }
+//        }
+    } catch (e: Throwable) { }
+    return null
+}
+
+/**
+ * 获取activity栈，如果在onCreate中调用，将没有当前activity
+ * 如果反射不好用 ，请尝试使用https://github.com/tiann/FreeReflection
+ *
+ */
+fun getActivities(): List<WeakReference<Activity>> {
+    var list = ArrayList<WeakReference<Activity>>()
+    try {
+        val mLoadedApkField = Application::class.java.getDeclaredField("mLoadedApk")
+        mLoadedApkField.isAccessible = true
+        val mLoadedApk = mLoadedApkField.get(getApp())
+        val mActivityThreadField = mLoadedApk.javaClass.getDeclaredField("mActivityThread")
+        mActivityThreadField.isAccessible = true
+        val mActivityThread = mActivityThreadField.get(mLoadedApk)
+        val mActivitiesField = mActivityThread.javaClass.getDeclaredField("mActivities")
+        mActivitiesField.isAccessible = true
+        val mActivities = mActivitiesField.get(mActivityThread) as Map<*, *>
+        for (value in mActivities.values) {
+            val activityField = value!!.javaClass.getDeclaredField("activity")
+            activityField.isAccessible = true
+            list.add(WeakReference(activityField.get(value) as Activity))
+        }
+    } catch (e: Throwable) { }
+    return list
+}
+
+fun Intent.startActivity(act: Activity? = null, callback: ((Int, Intent?) -> Unit)? = null) {
+    if (callback == null) {
+        if (act == null) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val ctx: Context? = act ?: getApp()
+        ctx?.startActivity(this)
+        return
+    }
+    val temp = act ?: getTopActivity() ?: return
+    Request().apply {
+        with(temp)
+        setIntent(this@startActivity)
+        setCallback(callback)
+    }.start()
 }
 
 fun <T> Any.getGenericClass(index: Int): Class<T>? {
@@ -42,22 +114,6 @@ fun <T> Any.getGenericClass(index: Int): Class<T>? {
     } catch (e: Throwable) {
         null
     }
-}
-
-fun Activity.startActivity(intent: Intent, callback: ((Int, Intent?) -> Unit)) {
-    Request().apply {
-        with(this@startActivity)
-        setIntent(intent)
-        setCallback(callback)
-    }.start()
-}
-
-fun Fragment.startActivity(intent: Intent, callback: ((Int, Intent?) -> Unit)) {
-    Request().apply {
-        with(this@startActivity.activity)
-        setIntent(intent)
-        setCallback(callback)
-    }.start()
 }
 
 fun Int.resToColor(): Int = getApp()!!.resources!!.getColor(this)

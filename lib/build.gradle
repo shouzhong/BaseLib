@@ -25,7 +25,7 @@ dependencies {
     api 'androidx.core:core-ktx:1.2.0'
     api 'com.drakeet.multitype:multitype:4.2.0'
     implementation 'com.shouzhong:Request:1.0.0'
-    compileOnly 'com.blankj:utilcodex:1.26.0'
+    compileOnly 'com.blankj:utilcodex:1.28.0'
 }
 
 //发布 Jcenter
