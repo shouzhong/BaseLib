@@ -108,9 +108,8 @@ fun Intent.startActivity(act: Activity? = null, callback: ((Int, Intent?) -> Uni
 }
 
 fun <T> Any.getGenericClass(index: Int): Class<T>? {
-    val pt: ParameterizedType = javaClass.genericSuperclass as ParameterizedType
     return try {
-        pt.actualTypeArguments[index] as Class<T>
+        (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[index] as Class<T>
     } catch (e: Throwable) {
         null
     }

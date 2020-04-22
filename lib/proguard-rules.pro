@@ -19,3 +19,14 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keepclassmembers public class * extends androidx.databinding.ViewDataBinding {
+    *** setVm(***);
+    *** setHolder(***);
+}
+-keepclassmembers class * extends com.shouzhong.base.rv.BHolder {
+    <init>(***,***);
+}
+-keepclassmembernames class kotlinx.** {
+    volatile <fields>;
+}

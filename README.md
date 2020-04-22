@@ -6,21 +6,7 @@
 ## 使用
 ### 依赖
 ```
-implementation 'com.shouzhong:BaseLib:1.0.0'
+implementation 'com.shouzhong:BaseLib:1.0.1'
 ```
 ### 代码
 [请参考demo](https://github.com/shouzhong/BaseLib/tree/master/app/src/main)
-
-## 混淆
-```
--keepclassmembers public class * extends androidx.databinding.ViewDataBinding {
-    *** setVm(***);
-    *** setHolder(***);
-}
--keepclassmembers class * extends com.shouzhong.base.rv.BHolder {
-    <init>(***,***);
-}
--keepclassmembernames class kotlinx.** {
-    volatile <fields>;
-}
-```
