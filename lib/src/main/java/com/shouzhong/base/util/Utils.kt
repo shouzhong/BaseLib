@@ -22,6 +22,11 @@ import com.shouzhong.request.Request
 import java.lang.ref.WeakReference
 import java.lang.reflect.ParameterizedType
 
+// *******************************************************************************
+// 对activity栈和eventbus有跨进程需要的，请关注：https://github.com/shouzhong/Bridge
+// *******************************************************************************
+
+
 private var bApp: Application? = null
 
 fun getApp(): Application? {
@@ -71,8 +76,8 @@ fun getTopActivity(): Activity? {
  * 如果反射不好用 ，请尝试使用https://github.com/tiann/FreeReflection
  *
  */
-fun getActivities(): List<WeakReference<Activity>> {
-    var list = ArrayList<WeakReference<Activity>>()
+fun getActivities(): List<Activity> {
+    var list = ArrayList<Activity>()
     try {
         val mLoadedApkField = Application::class.java.getDeclaredField("mLoadedApk")
         mLoadedApkField.isAccessible = true
@@ -86,7 +91,7 @@ fun getActivities(): List<WeakReference<Activity>> {
         for (value in mActivities.values) {
             val activityField = value!!.javaClass.getDeclaredField("activity")
             activityField.isAccessible = true
-            list.add(WeakReference(activityField.get(value) as Activity))
+            list.add(activityField.get(value) as Activity)
         }
     } catch (e: Throwable) { }
     return list

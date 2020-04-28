@@ -14,7 +14,7 @@ class FragmentViewModel : BViewModel() {
     private fun log(name: String) {
         LogUtils.e(StringBuffer(name).apply {
             for (act in getActivities()) {
-                append("\n").append(act.get()?.javaClass?.name)
+                append("\n").append(act.javaClass?.name)
             }
             append("\ntopAct:").append(getTopActivity()?.javaClass?.name)
         })
