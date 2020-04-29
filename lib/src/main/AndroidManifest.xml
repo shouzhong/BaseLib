@@ -1,5 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.shouzhong.base" >
     <application  >
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.shouzhong.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shouzhong_file_paths" />
+        </provider>
     </application>
 </manifest>

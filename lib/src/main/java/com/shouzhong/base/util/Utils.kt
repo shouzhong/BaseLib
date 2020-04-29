@@ -8,8 +8,13 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Build
+import android.text.TextUtils
 import android.view.View
+import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
 import com.shouzhong.base.annotation.*
@@ -19,13 +24,15 @@ import com.shouzhong.base.popup.BPopup
 import com.shouzhong.base.popup.BPopupBean
 import com.shouzhong.base.popup.PopupFragment
 import com.shouzhong.request.Request
-import java.lang.ref.WeakReference
+import java.io.File
 import java.lang.reflect.ParameterizedType
 
-// *******************************************************************************
-// 对activity栈和eventbus有跨进程需要的，请关注：https://github.com/shouzhong/Bridge
-// *******************************************************************************
 
+// ****************************************************************************************************
+// 跨进程的activity栈和eventbus，请关注：https://github.com/shouzhong/Bridge
+// 屏幕适配，请关注：https://github.com/shouzhong/ScreenHelper
+// 扫码、身份证、银行卡等，请关注：https://github.com/shouzhong/Scanner
+// ****************************************************************************************************
 
 private var bApp: Application? = null
 
@@ -43,7 +50,7 @@ fun getApp(): Application? {
 
 /**
  * 获取顶层Activity，如果在onCreate中调用，将不是当前activity
- * 如果反射不好用 ，请尝试使用https://github.com/tiann/FreeReflection
+ * 如果反射无法使用 ，请尝试使用https://github.com/tiann/FreeReflection
  *
  */
 fun getTopActivity(): Activity? {
@@ -73,7 +80,7 @@ fun getTopActivity(): Activity? {
 
 /**
  * 获取activity栈，如果在onCreate中调用，将没有当前activity
- * 如果反射不好用 ，请尝试使用https://github.com/tiann/FreeReflection
+ * 如果反射无法使用 ，请尝试使用：https://github.com/tiann/FreeReflection
  *
  */
 fun getActivities(): List<Activity> {
@@ -97,16 +104,14 @@ fun getActivities(): List<Activity> {
     return list
 }
 
-fun Intent.startActivity(act: Activity? = null, callback: ((Int, Intent?) -> Unit)? = null) {
-    if (callback == null) {
-        if (act == null) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        val ctx: Context? = act ?: getApp()
-        ctx?.startActivity(this)
+fun Intent.startActivity(ctx: Context = getApp()!!, callback: ((Int, Intent?) -> Unit)? = null) {
+    if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    if (ctx !is Activity || callback == null) {
+        ctx.startActivity(this)
         return
     }
-    val temp = act ?: getTopActivity() ?: return
     Request().apply {
-        with(temp)
+        with(ctx as Activity)
         setIntent(this@startActivity)
         setCallback(callback)
     }.start()
@@ -138,6 +143,10 @@ fun View.gray() = setLayerType(View.LAYER_TYPE_HARDWARE, Paint().apply {
     })
 })
 
+/**
+ * 要想和BViewModel，BHolder等使用注解生成Dialog，请在这个类中调用该方法初始化
+ *
+ */
 fun Any.initDialog(act: AppCompatActivity) {
     val dialogSwitchMap = HashMap<Class<out BDialog<out BViewModel<*>>>, ObservableBoolean>()
     val dialogDataMap = HashMap<Class<out BDialog<out BViewModel<*>>>, Any>()
@@ -189,6 +198,10 @@ fun Any.initDialog(act: AppCompatActivity) {
 
 typealias BPopupViewModel = com.shouzhong.base.popup.BViewModel<out BPopupBean>
 
+/**
+ * 要想和BViewModel，BHolder等使用注解生成PopupWindows，请在这个类中调用该方法初始化
+ *
+ */
 fun Any.initPopup(act: AppCompatActivity) {
     val popupSwitchMap = HashMap<Class<out BPopup<out BPopupViewModel>>, ObservableBoolean>()
     val popupDataMap = HashMap<Class<out BPopup<out BPopupViewModel>>, BPopupBean>()
@@ -250,5 +263,36 @@ fun Any.initPopup(act: AppCompatActivity) {
             }
         })
     }
+}
+
+/**
+ * 调用三方应用打开文件
+ * 如果是安装应用，请加权限：<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+ *
+ */
+fun File.openByOtherApp(ctx: Context = getApp()!!, callback: ((Int, Intent?) -> Unit)? = null) {
+    if (!isFile) return
+    val mimeType = absolutePath.getMimeType()
+    if (TextUtils.isEmpty(mimeType)) return
+    Intent(Intent.ACTION_VIEW).apply {
+        if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            setDataAndType(FileProvider.getUriForFile(ctx.applicationContext, ctx.applicationContext.packageName + ".shouzhong.fileprovider", this@openByOtherApp), mimeType)
+        } else {
+            setDataAndType(Uri.fromFile(this@openByOtherApp), mimeType)
+        }
+    }.startActivity(ctx, callback)
+}
+
+/**
+ * 获取MIME类型
+ *
+ * @return 格式为：xxx/xxx，如：application/vnd.android.package-archive
+ */
+fun String.getMimeType(): String? {
+    if (TextUtils.isEmpty(this)) return null
+    val ext = MimeTypeMap.getFileExtensionFromUrl(this)
+    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
 }
 
