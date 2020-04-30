@@ -22,6 +22,6 @@ android {
 
 dependencies {
     implementation project(":lib")
-    implementation 'com.blankj:utilcodex:1.28.0'
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:2.0"
+    implementation 'com.blankj:utilcodex:1.28.3'
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:2.2"
 }

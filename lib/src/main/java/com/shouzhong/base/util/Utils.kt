@@ -111,7 +111,7 @@ fun Intent.startActivity(ctx: Context = getApp()!!, callback: ((Int, Intent?) ->
         return
     }
     Request().apply {
-        with(ctx as Activity)
+        with(ctx)
         setIntent(this@startActivity)
         setCallback(callback)
     }.start()
