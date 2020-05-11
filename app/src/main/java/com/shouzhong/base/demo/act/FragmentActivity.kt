@@ -1,50 +1,71 @@
 package com.shouzhong.base.demo.act
 
 import android.os.Bundle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.OnLifecycleEvent
 import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.demo.R
-import com.shouzhong.base.util.getActivities
-import com.shouzhong.base.util.getTopActivity
 
 class FragmentActivity  : BActivity<FragmentViewModel>(R.layout.act_fragment)
 
 class FragmentViewModel : BViewModel() {
-    private fun log(name: String) {
-        LogUtils.e(StringBuffer(name).apply {
-            for (act in getActivities()) {
-                append("\n").append(act.javaClass?.name)
-            }
-            append("\ntopAct:").append(getTopActivity()?.javaClass?.name)
-        })
+    override fun init() {
+        LogUtils.e("init")
     }
 
-    override fun init() {
-        log("init")
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun a() {
+        LogUtils.e("onCreate1")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun b() {
+        LogUtils.e("onStart1")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun c() {
+        LogUtils.e("onResume1")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun d() {
+        LogUtils.e("onPause1")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun e() {
+        LogUtils.e("onStop1")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun f() {
+        LogUtils.e("onDestroy1")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        log("onCreate")
+        LogUtils.e("onCreate2")
     }
 
     override fun onStart() {
-        log("onStart")
+        LogUtils.e("onStart2")
     }
 
     override fun onResume() {
-        log("onResume")
+        LogUtils.e("onResume2")
     }
 
     override fun onPause() {
-        log("onPause")
+        LogUtils.e("onPause2")
     }
 
     override fun onStop() {
-        log("onStop")
+        LogUtils.e("onStop2")
     }
 
     override fun onDestroy() {
-        log("onDestroy")
+        LogUtils.e("onDestroy2")
     }
 }

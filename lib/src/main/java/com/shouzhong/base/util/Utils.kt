@@ -48,61 +48,61 @@ fun getApp(): Application? {
     return bApp
 }
 
-/**
- * 获取顶层Activity，如果在onCreate中调用，将不是当前activity
- * 如果反射无法使用 ，请尝试使用https://github.com/tiann/FreeReflection
- *
- */
-fun getTopActivity(): Activity? {
-    try {
-        val activityThreadClass = Class.forName("android.app.ActivityThread")
-        val currentActivityThreadMethod = activityThreadClass.getMethod("currentActivityThread").invoke(null)
-        val mActivityListField = activityThreadClass.getDeclaredField("mActivities")
-        mActivityListField.isAccessible = true
-        val activities = mActivityListField.get(currentActivityThreadMethod) as Map<*, *>
-        val last = activities.values.last()!!
-        val activityField = last.javaClass.getDeclaredField("activity")
-        activityField.isAccessible = true
-        return activityField.get(last) as Activity
-//        for (activityRecord in activities.values) {
-//            val activityRecordClass = activityRecord!!.javaClass
-//            val pausedField = activityRecordClass.getDeclaredField("paused")
-//            pausedField.isAccessible = true
-//            if (!pausedField.getBoolean(activityRecord)) {
-//                val activityField = activityRecordClass.getDeclaredField("activity")
-//                activityField.isAccessible = true
-//                return activityField.get(activityRecord) as Activity
-//            }
+///**
+// * 获取顶层Activity，如果在onCreate中调用，将不是当前activity
+// * 如果反射无法使用 ，请尝试使用https://github.com/tiann/FreeReflection
+// *
+// */
+//fun getTopActivity(): Activity? {
+//    try {
+//        val activityThreadClass = Class.forName("android.app.ActivityThread")
+//        val currentActivityThreadMethod = activityThreadClass.getMethod("currentActivityThread").invoke(null)
+//        val mActivityListField = activityThreadClass.getDeclaredField("mActivities")
+//        mActivityListField.isAccessible = true
+//        val activities = mActivityListField.get(currentActivityThreadMethod) as Map<*, *>
+//        val last = activities.values.last()!!
+//        val activityField = last.javaClass.getDeclaredField("activity")
+//        activityField.isAccessible = true
+//        return activityField.get(last) as Activity
+////        for (activityRecord in activities.values) {
+////            val activityRecordClass = activityRecord!!.javaClass
+////            val pausedField = activityRecordClass.getDeclaredField("paused")
+////            pausedField.isAccessible = true
+////            if (!pausedField.getBoolean(activityRecord)) {
+////                val activityField = activityRecordClass.getDeclaredField("activity")
+////                activityField.isAccessible = true
+////                return activityField.get(activityRecord) as Activity
+////            }
+////        }
+//    } catch (e: Throwable) { }
+//    return null
+//}
+//
+///**
+// * 获取activity栈，如果在onCreate中调用，将没有当前activity
+// * 如果反射无法使用 ，请尝试使用：https://github.com/tiann/FreeReflection
+// *
+// */
+//fun getActivities(): List<Activity> {
+//    var list = ArrayList<Activity>()
+//    try {
+//        val mLoadedApkField = Application::class.java.getDeclaredField("mLoadedApk")
+//        mLoadedApkField.isAccessible = true
+//        val mLoadedApk = mLoadedApkField.get(getApp())
+//        val mActivityThreadField = mLoadedApk.javaClass.getDeclaredField("mActivityThread")
+//        mActivityThreadField.isAccessible = true
+//        val mActivityThread = mActivityThreadField.get(mLoadedApk)
+//        val mActivitiesField = mActivityThread.javaClass.getDeclaredField("mActivities")
+//        mActivitiesField.isAccessible = true
+//        val mActivities = mActivitiesField.get(mActivityThread) as Map<*, *>
+//        for (value in mActivities.values) {
+//            val activityField = value!!.javaClass.getDeclaredField("activity")
+//            activityField.isAccessible = true
+//            list.add(activityField.get(value) as Activity)
 //        }
-    } catch (e: Throwable) { }
-    return null
-}
-
-/**
- * 获取activity栈，如果在onCreate中调用，将没有当前activity
- * 如果反射无法使用 ，请尝试使用：https://github.com/tiann/FreeReflection
- *
- */
-fun getActivities(): List<Activity> {
-    var list = ArrayList<Activity>()
-    try {
-        val mLoadedApkField = Application::class.java.getDeclaredField("mLoadedApk")
-        mLoadedApkField.isAccessible = true
-        val mLoadedApk = mLoadedApkField.get(getApp())
-        val mActivityThreadField = mLoadedApk.javaClass.getDeclaredField("mActivityThread")
-        mActivityThreadField.isAccessible = true
-        val mActivityThread = mActivityThreadField.get(mLoadedApk)
-        val mActivitiesField = mActivityThread.javaClass.getDeclaredField("mActivities")
-        mActivitiesField.isAccessible = true
-        val mActivities = mActivitiesField.get(mActivityThread) as Map<*, *>
-        for (value in mActivities.values) {
-            val activityField = value!!.javaClass.getDeclaredField("activity")
-            activityField.isAccessible = true
-            list.add(activityField.get(value) as Activity)
-        }
-    } catch (e: Throwable) { }
-    return list
-}
+//    } catch (e: Throwable) { }
+//    return list
+//}
 
 fun Intent.startActivity(ctx: Context = getApp()!!, callback: ((Int, Intent?) -> Unit)? = null) {
     if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -272,10 +272,9 @@ fun Any.initPopup(act: AppCompatActivity) {
  */
 fun File.openByOtherApp(ctx: Context = getApp()!!, callback: ((Int, Intent?) -> Unit)? = null) {
     if (!isFile) return
-    val mimeType = absolutePath.getMimeType()
+    val mimeType = absolutePath.toMimeType()
     if (TextUtils.isEmpty(mimeType)) return
     Intent(Intent.ACTION_VIEW).apply {
-        if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             setDataAndType(FileProvider.getUriForFile(ctx.applicationContext, ctx.applicationContext.packageName + ".shouzhong.fileprovider", this@openByOtherApp), mimeType)
@@ -290,7 +289,7 @@ fun File.openByOtherApp(ctx: Context = getApp()!!, callback: ((Int, Intent?) -> 
  *
  * @return 格式为：xxx/xxx，如：application/vnd.android.package-archive
  */
-fun String.getMimeType(): String? {
+fun String.toMimeType(): String? {
     if (TextUtils.isEmpty(this)) return null
     val ext = MimeTypeMap.getFileExtensionFromUrl(this)
     return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)

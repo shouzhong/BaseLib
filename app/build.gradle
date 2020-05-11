@@ -22,6 +22,8 @@ android {
 
 dependencies {
     implementation project(":lib")
-    implementation 'com.blankj:utilcodex:1.28.3'
+    implementation 'org.greenrobot:eventbus:3.2.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.blankj:utilcodex:1.28.4'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:2.2"
 }

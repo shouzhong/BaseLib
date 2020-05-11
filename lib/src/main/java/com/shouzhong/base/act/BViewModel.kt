@@ -4,9 +4,12 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.KeyEvent
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.ViewModel
+import com.shouzhong.bridge.ActivityStack
 
-abstract class BViewModel {
-    var act: BActivity<*>? = null
+abstract class BViewModel : ViewModel(), LifecycleObserver {
+    var uniqueId: String? = null
 
     open fun init() = Unit
 
@@ -38,8 +41,5 @@ abstract class BViewModel {
 
     open fun onRestoreInstanceState(savedInstanceState: Bundle) = Unit
 
-    inline fun <reified T : BActivity<*>> getActivity(): T? = when(act) {
-        is T -> act as T
-        else -> null
-    }
+    inline fun <reified T : BActivity<*>> getActivity(): T = ActivityStack.getActivity(uniqueId) as T
 }

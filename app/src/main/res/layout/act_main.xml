@@ -33,5 +33,12 @@
             android:layout_marginTop="20dp"
             android:text="popup"
             android:onClick="@{vm::onClickPopup}"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="permission"
+            android:onClick="@{vm::onClickPermission}"/>
     </LinearLayout>
 </layout>

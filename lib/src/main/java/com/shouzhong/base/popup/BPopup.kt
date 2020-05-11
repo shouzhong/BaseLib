@@ -8,7 +8,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
 import com.shouzhong.base.util.getGenericClass
+import com.shouzhong.bridge.FragmentStack
 
 open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
     var binding: ViewDataBinding? = null
@@ -50,6 +52,12 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
         data?.relatedView?.set(null)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        lifecycle.addObserver(getVm())
+        vm?.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,19 +66,19 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
         binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
             isAccessible = true
-            invoke(binding, getVm())
+            invoke(binding, vm)
         }
         return binding?.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        vm?.onViewCreated(view, savedInstanceState)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         vm?.onActivityCreated(savedInstanceState)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        vm?.onSaveInstanceState(outState)
     }
 
     override fun onStart() {
@@ -95,19 +103,27 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        vm?.onDestroy()
-        vm?.popup = null
-        vm = null
+        vm?.onDestroyView()
         binding?.unbind()
         binding = null
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        vm?.onDestroy()
+        vm = null
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        vm?.onSaveInstanceState(outState)
+    }
+
     fun getVm(): T {
         if (vm != null) return vm!!
-        vm = getGenericClass<T>(0)?.newInstance()?.apply {
-            popup = this@BPopup
-            setData(this@BPopup.data)
-        }
+        vm = ViewModelProvider(this).get(getGenericClass<T>(0)!!)
+        vm?.uniqueId = FragmentStack.getUniqueId(this)
+        vm?.setData(data)
         vm?.init()
         return vm!!
     }

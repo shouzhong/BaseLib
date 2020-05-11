@@ -10,7 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.shouzhong.base.util.*
+import com.shouzhong.bridge.FragmentStack
 
 abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
     var binding: ViewDataBinding? = null
@@ -21,7 +23,8 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getVm().onCreated(savedInstanceState)
+        lifecycle.addObserver(getVm())
+        vm?.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -33,7 +36,7 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
         binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
             isAccessible = true
-            invoke(binding, getVm())
+            invoke(binding, vm)
         }
         return binding?.root
     }
@@ -44,17 +47,18 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
             if (userVisibleHint && !isHidden) {
                 if (!isFirstVisible) {
                     isFirstVisible = true
-                    getVm().onFragmentFirstVisible()
+                    vm?.onFragmentFirstVisible()
                 }
-                getVm().onFragmentVisibleChange(true)
+                vm?.onFragmentVisibleChange(true)
             }
         }
         super.onViewCreated(view, savedInstanceState)
+        vm?.onViewCreated(view, savedInstanceState)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        getVm().onActivityCreated(savedInstanceState)
+        vm?.onActivityCreated(savedInstanceState)
     }
 
     override fun onStart() {
@@ -112,7 +116,7 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         if (!isFirst) return
         if (!isFirstVisible && isVisibleToUser) {
             isFirstVisible = true
-            getVm().onFragmentFirstVisible()
+            vm?.onFragmentFirstVisible()
         }
         vm?.onFragmentVisibleChange(isVisibleToUser)
     }
@@ -122,16 +126,15 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         if (!isFirst) return
         if (!isFirstVisible && !hidden) {
             isFirstVisible = true
-            getVm().onFragmentFirstVisible()
+            vm?.onFragmentFirstVisible()
         }
         vm?.onFragmentVisibleChange(!hidden)
     }
 
     fun getVm(): T {
         if (vm != null) return vm!!
-        vm = getGenericClass<T>(0)?.newInstance()?.apply {
-            frgm = this@BFragment
-        }
+        vm = ViewModelProvider(this).get(getGenericClass<T>(0)!!)
+        vm?.uniqueId = FragmentStack.getUniqueId(this)
         if (activity is AppCompatActivity) {
             vm?.initDialog(activity as AppCompatActivity)
             vm?.initPopup(activity as AppCompatActivity)

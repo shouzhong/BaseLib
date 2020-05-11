@@ -11,7 +11,6 @@ import com.shouzhong.base.annotation.PopupSwitch
 import com.shouzhong.base.demo.R
 import com.shouzhong.base.demo.popup.TestPopup
 import com.shouzhong.base.demo.popup.TestPopupBean
-import com.shouzhong.base.demo.popup.TestPopupListener
 import com.shouzhong.base.popup.PopupFragment
 
 class PopupActivity : BActivity<PopupViewModel>(R.layout.act_popup)
@@ -72,11 +71,9 @@ class PopupViewModel : BViewModel() {
                 else -> Gravity.NO_GRAVITY
             })
             title.set("Popup")
-            listener.set(object : TestPopupListener {
-                override fun onClick() {
-                    testPopupSwitch.set(false)
-                }
-            })
+            listener.set {
+                testPopupSwitch.set(false)
+            }
         }
         testPopupCancelable.set(true)
         testPopupSwitch.set(true)

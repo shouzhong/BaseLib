@@ -16,14 +16,14 @@ class MainViewModel : BViewModel() {
     }
 
     fun onClickDialog(view: View) {
-        getActivity<MainActivity>()?.startActivity(
-            Intent(getActivity(), DialogActivity::class.java)
-        )
+        Intent(getActivity(), DialogActivity::class.java).startActivity(getActivity())
     }
 
     fun onClickPopup(view: View) {
-        getActivity<MainActivity>()?.startActivity(
-            Intent(getActivity(), PopupActivity::class.java)
-        )
+        Intent(getActivity(), PopupActivity::class.java).startActivity(getActivity())
+    }
+
+    fun onClickPermission(view: View) {
+        Intent(getActivity(), PermissionActivity::class.java).startActivity(getActivity())
     }
 }

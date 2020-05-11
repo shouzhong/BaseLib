@@ -3,10 +3,14 @@ package com.shouzhong.base.frgm
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.View
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.ViewModel
 import com.shouzhong.base.act.BActivity
+import com.shouzhong.bridge.FragmentStack
 
-abstract class BViewModel {
-    var frgm: BFragment<*>? = null
+abstract class BViewModel : ViewModel(), LifecycleObserver {
+    var uniqueId: String? = null
 
     open fun init() = Unit
 
@@ -14,7 +18,9 @@ abstract class BViewModel {
 
     open fun onFragmentVisibleChange(isVisible: Boolean) = Unit
 
-    open fun onCreated(savedInstanceState: Bundle?) = Unit
+    open fun onCreate(savedInstanceState: Bundle?) = Unit
+
+    open fun onViewCreated(view: View, savedInstanceState: Bundle?) = Unit
 
     open fun onActivityCreated(savedInstanceState: Bundle?) = Unit
 
@@ -36,13 +42,7 @@ abstract class BViewModel {
 
     open fun onSaveInstanceState(outState: Bundle) = Unit
 
-    inline fun <reified T : BFragment<*>> getFragment(): T? = when(frgm) {
-        is T -> frgm as T
-        else -> null
-    }
+    inline fun <reified T : BFragment<*>> getFragment(): T = FragmentStack.getFragment(uniqueId) as T
 
-    inline fun <reified T : BActivity<*>> getActivity(): T? = when(frgm?.activity) {
-        is T -> frgm?.activity as  T
-        else -> null
-    }
+    inline fun <reified T : BActivity<*>> getActivity(): T = getFragment<BFragment<*>>().activity as T
 }

@@ -7,9 +7,11 @@ import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.ViewModelProvider
 import com.shouzhong.base.util.getGenericClass
 import com.shouzhong.base.util.initDialog
 import com.shouzhong.base.util.initPopup
+import com.shouzhong.bridge.ActivityStack
 
 abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity() {
     var binding: ViewDataBinding? = null
@@ -24,6 +26,7 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
             isAccessible = true
             invoke(binding, getVm())
         }
+        lifecycle.addObserver(vm!!)
         vm?.onCreate(savedInstanceState)
     }
 
@@ -95,9 +98,8 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
 
     fun getVm(): T {
         if (vm != null) return vm!!
-        vm = getGenericClass<T>(0)?.newInstance()?.apply {
-            act = this@BActivity
-        }
+        vm = ViewModelProvider(this).get(getGenericClass<T>(0)!!)
+        vm?.uniqueId = ActivityStack.getUniqueId(this)
         vm?.initDialog(this)
         vm?.initPopup(this)
         vm?.init()

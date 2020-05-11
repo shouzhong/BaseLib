@@ -10,7 +10,9 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
 import com.shouzhong.base.util.*
+import com.shouzhong.bridge.FragmentStack
 
 abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() {
     var binding: ViewDataBinding? = null
@@ -45,6 +47,12 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         showSwitch?.set(false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        lifecycle.addObserver(getVm())
+        vm?.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,9 +61,14 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
         binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
             isAccessible = true
-            invoke(binding, getVm())
+            invoke(binding, vm)
         }
         return binding?.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        vm?.onViewCreated(view, savedInstanceState)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -67,11 +80,6 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         initAttributes(attributes)
         dialog?.window?.attributes = attributes
         vm?.onActivityCreated(savedInstanceState)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        vm?.onSaveInstanceState(outState)
     }
 
     override fun onStart() {
@@ -97,19 +105,27 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
     override fun onDestroyView() {
         dialog?.setOnCancelListener(null)
         super.onDestroyView()
-        vm?.onDestroy()
-        vm?.dlg = null
-        vm = null
+        vm?.onDestroyView()
         binding?.unbind()
         binding = null
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        vm?.onDestroy()
+        vm = null
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        vm?.onSaveInstanceState(outState)
+    }
+
     fun getVm(): T {
         if (vm != null) return vm!!
-        vm = getGenericClass<T>(0)?.newInstance()?.apply {
-            dlg = this@BDialog
-            setData(this@BDialog.data)
-        }
+        vm = ViewModelProvider(this).get(getGenericClass<T>(0)!!)
+        vm?.uniqueId = FragmentStack.getUniqueId(this)
+        vm?.setData(data)
         vm?.init()
         return vm!!
     }

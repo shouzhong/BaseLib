@@ -11,15 +11,11 @@ class TestPopup : BPopup<TestViewModel>(R.layout.popup_test)
 
 class TestViewModel : BViewModel<TestPopupBean>() {
     fun onClick(view: View) {
-        data?.listener?.get()?.onClick()
+        data?.listener?.get()?.invoke()
     }
 }
 
 data class TestPopupBean(
     val title:  ObservableField<CharSequence> = ObservableField(),
-    val listener: ObservableField<TestPopupListener> = ObservableField()
+    val listener: ObservableField<() -> Unit> = ObservableField()
 ) : BPopupBean()
-
-interface TestPopupListener {
-    fun onClick()
-}

@@ -10,16 +10,12 @@ class TestDialog : BDialog<TestViewModel>(R.layout.dlg_test)
 
 class TestViewModel : BViewModel<TestDialogBean>() {
     fun onClick(view: View) {
-        data?.listener?.get()?.onClick()
+        data?.listener?.get()?.invoke()
     }
 }
 
 data class TestDialogBean(
     val title:  ObservableField<CharSequence> = ObservableField(),
     val content: ObservableField<CharSequence> = ObservableField(),
-    val listener: ObservableField<TestDialogListener> = ObservableField()
+    val listener: ObservableField<() -> Unit> = ObservableField()
 )
-
-interface TestDialogListener {
-    fun onClick()
-}
