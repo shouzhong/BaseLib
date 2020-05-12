@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.shouzhong.base.act.BActivity
@@ -45,4 +46,11 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
     inline fun <reified T : BFragment<*>> getFragment(): T = FragmentStack.getFragment(uniqueId) as T
 
     inline fun <reified T : BActivity<*>> getActivity(): T = getFragment<BFragment<*>>().activity as T
+
+    inline fun <reified T : ViewDataBinding> getBinding(): T? =
+        try {
+            getFragment<BFragment<*>>().binding as T
+        } catch (e: Throwable) {
+            null
+        }
 }

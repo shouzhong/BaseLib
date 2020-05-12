@@ -14,6 +14,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{vm.text}"/>
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,5 +45,12 @@
             android:layout_marginTop="20dp"
             android:text="permission"
             android:onClick="@{vm::onClickPermission}"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="request"
+            android:onClick="@{vm::onClickRequest}"/>
     </LinearLayout>
 </layout>

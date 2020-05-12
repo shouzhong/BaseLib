@@ -54,36 +54,29 @@ class PermissionActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, request, 0)
             return
         }
-        if (data.type == 1 || data.type == 2) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                data.isGranted = true
-                EventBusUtils.post(data)
-                finish()
-                return
-            }
-            try {
-                Intent(
-                    when(data.type) {
-                        1 -> Settings.ACTION_MANAGE_WRITE_SETTINGS
-                        2 -> Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-                        else -> null
-                    }
-                ).apply {
-                    data = Uri.parse("package:$packageName")
-                }.startActivity(this) { _, _ ->
-                    data.isGranted = when(data.type) {
-                        1 -> PermissionUtils.isGrantedWriteSettings()
-                        2 -> PermissionUtils.isGrantedOverlay()
-                        else -> false
-                    }
-                    EventBusUtils.post(data)
-                    finish()
+        try {
+            Intent(
+                when (data.type) {
+                    1 -> Settings.ACTION_MANAGE_WRITE_SETTINGS
+                    2 -> Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                    3 -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                    else -> null
                 }
-            } catch (e: Throwable) {
+            ).apply {
+                data = Uri.parse("package:$packageName")
+            }.startActivity(this) { _, _ ->
+                data.isGranted = when (data.type) {
+                    1 -> PermissionUtils.isGrantedWriteSettings()
+                    2 -> PermissionUtils.isGrantedOverlay()
+                    3 -> PermissionUtils.isGrantedNotification()
+                    else -> false
+                }
                 EventBusUtils.post(data)
                 finish()
             }
-            return
+        } catch (e: Throwable) {
+            EventBusUtils.post(data)
+            finish()
         }
     }
 

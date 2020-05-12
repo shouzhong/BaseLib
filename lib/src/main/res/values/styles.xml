@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="theme_permission" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="theme_shouzhong_translucent" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">#00000000</item>
         <item name="android:windowIsTranslucent">true</item>

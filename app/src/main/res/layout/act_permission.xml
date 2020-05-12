@@ -7,39 +7,50 @@
             type="com.shouzhong.base.demo.act.PermissionViewModel" />
     </data>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center">
-        <TextView
-            android:id="@+id/tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{vm.text}"/>
+        android:overScrollMode="never">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{vm.text}"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="permission"
-            android:onClick="@{vm::onClickPermission}"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="permission"
+                android:onClick="@{vm::onClickPermission}"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="write_settings"
-            android:onClick="@{vm::onClickWriteSettings}"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="write_settings"
+                android:onClick="@{vm::onClickWriteSettings}"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="overlay"
-            android:onClick="@{vm::onClickOverlay}"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="overlay"
+                android:onClick="@{vm::onClickOverlay}"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="app_detail"
-            android:onClick="@{vm::onClickAppDetail}"/>
-    </LinearLayout>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="notification"
+                android:onClick="@{vm::onClickNotification}"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="app_detail"
+                android:onClick="@{vm::onClickAppDetail}"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </layout>

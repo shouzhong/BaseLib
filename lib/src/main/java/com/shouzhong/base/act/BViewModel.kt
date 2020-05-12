@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.KeyEvent
+import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.shouzhong.bridge.ActivityStack
@@ -42,4 +43,11 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
     open fun onRestoreInstanceState(savedInstanceState: Bundle) = Unit
 
     inline fun <reified T : BActivity<*>> getActivity(): T = ActivityStack.getActivity(uniqueId) as T
+
+    inline fun <reified T : ViewDataBinding> getBinding(): T? =
+        try {
+            getActivity<BActivity<*>>().binding as T
+        } catch (e: Throwable) {
+            null
+        }
 }

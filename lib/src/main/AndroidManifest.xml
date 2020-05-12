@@ -3,7 +3,12 @@
     <application  >
         <activity
             android:name=".permission.PermissionActivity"
-            android:theme="@style/theme_permission"
+            android:theme="@style/theme_shouzhong_translucent"
+            android:excludeFromRecents="true"/>
+
+        <activity
+            android:name=".request.RequestActivity"
+            android:theme="@style/theme_shouzhong_translucent"
             android:excludeFromRecents="true"/>
 
         <provider

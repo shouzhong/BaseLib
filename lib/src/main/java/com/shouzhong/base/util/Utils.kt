@@ -23,7 +23,7 @@ import com.shouzhong.base.dlg.BViewModel
 import com.shouzhong.base.popup.BPopup
 import com.shouzhong.base.popup.BPopupBean
 import com.shouzhong.base.popup.PopupFragment
-import com.shouzhong.request.Request
+import com.shouzhong.base.request.RequestUtils
 import java.io.File
 import java.lang.reflect.ParameterizedType
 
@@ -105,16 +105,12 @@ fun getApp(): Application? {
 //}
 
 fun Intent.startActivity(ctx: Context = getApp()!!, callback: ((Int, Intent?) -> Unit)? = null) {
-    if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    if (ctx !is Activity || callback == null) {
+    if (callback == null) {
+        if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         ctx.startActivity(this)
         return
     }
-    Request().apply {
-        with(ctx)
-        setIntent(this@startActivity)
-        setCallback(callback)
-    }.start()
+    RequestUtils.startActivityForResult(ctx, this, callback)
 }
 
 fun <T> Any.getGenericClass(index: Int): Class<T>? {
@@ -293,5 +289,18 @@ fun String.toMimeType(): String? {
     if (TextUtils.isEmpty(this)) return null
     val ext = MimeTypeMap.getFileExtensionFromUrl(this)
     return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
+}
+
+/**
+ * 获取hashdode
+ *
+ */
+fun hashCode(obj: Any): Int {
+    try {
+        val method = obj.javaClass.getDeclaredMethod("identityHashCode", Any::class.java)
+        method.isAccessible = true
+        return method.invoke(null, obj) as Int
+    } catch (e: Throwable) {}
+    return obj.hashCode()
 }
 

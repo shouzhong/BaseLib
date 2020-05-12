@@ -2,6 +2,7 @@ package com.shouzhong.base.dlg
 
 import android.os.Bundle
 import android.view.View
+import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.shouzhong.bridge.FragmentStack
@@ -37,4 +38,11 @@ abstract class BViewModel<T> : ViewModel(), LifecycleObserver {
     }
 
     inline fun <reified T : BDialog<*>> getDialog(): T = FragmentStack.getFragment(uniqueId) as T
+
+    inline fun <reified T : ViewDataBinding> getBinding(): T? =
+        try {
+            getDialog<BDialog<*>>().binding as T
+        } catch (e: Throwable) {
+            null
+        }
 }
