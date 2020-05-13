@@ -113,7 +113,7 @@ class YourDialog : BDialog<YourViewModel>(R.layout.布局id)
         ...
     </LinearLayout>
 </layout>
-// 在Activity和Fragment中使用用，在其ViewModel中
+// 在Activity、Fragment和RecyclerView中使用，在其ViewModel或holder中
 // 开关
 @DialogSwitch(YourDialog::class)
 val yourDialogSwitch = ObservableBoolean(false)
