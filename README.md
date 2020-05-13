@@ -148,7 +148,7 @@ class YourPopup : BPopup<YourViewModel>(R.layout.布局id)
         ...
     </LinearLayout>
 </layout>
-// 在Activity和Fragment中使用用，在其ViewModel中
+// 在Activity、Fragment和RecyclerView中使用，在其ViewModel或holder中
 @PopupSwitch(YourPopup::class)
 val yourPopupSwitch = ObservableBoolean(false)
 @PopupData(YourPopup::class)
