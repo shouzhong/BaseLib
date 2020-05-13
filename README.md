@@ -15,11 +15,11 @@ BUtils.init(application)
 ```
 在Activity中使用
 ```
-首先创建ViewModel
+// 首先创建ViewModel
 class YourViewMode : BViewModel()
-然后创建Activity
+// 然后创建Activity
 class YourActivity : BActivity<YourViewMode>(R.layout.布局id)
-布局格式，variable一定要以vm命名，且只有这一个
+// 布局格式，variable一定要以vm命名，且只有这一个
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
@@ -37,13 +37,11 @@ class YourActivity : BActivity<YourViewMode>(R.layout.布局id)
 ```
 在Fragment中使用
 ```
-首先创建ViewModel
+// 首先创建ViewModel
 class YourViewMode : BViewModel()
-然后创建Fragment
+// 然后创建Fragment
 class YourFragment : BFragment<YourViewMode>(R.layout.布局id)
-然后创建Fragment
-class YourFragment : BFragment<YourViewMode>(R.layout.布局id)
-布局格式，variable一定要以vm命名，且只有这一个
+// 布局格式，variable一定要以vm命名，且只有这一个
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
@@ -61,24 +59,24 @@ class YourFragment : BFragment<YourViewMode>(R.layout.布局id)
 ```
 在RecyclerView的中使用，关于adapter请参考[MultiType](https://github.com/drakeet/MultiType)
 ```
-首先创建数据集
+// 首先创建数据集
 val dataList = DataList().apply {
     adapter.run {
         // 可以注册多个
         register(YourBean::class, YourBinder())
     }
 }
-然后在布局中
+// 然后在布局中
 <androidx.recyclerview.widget.RecyclerView
     ...
     app:adapter="@{vm.dataList.adapter}"
 />
-创建子项流程
-首先创建Holder
+// 创建子项流程
+// 首先创建Holder
 class YourHolder(itemView: View, dataList: DataList) : BHolder<YourBean>(itemView, dataList)
-然后创建Binder
+// 然后创建Binder
 class YourBinder : BBinder<YourBean, YourHolder>(R.layout.布局id)
-布局格式，variable一定要以holder命名，且只有这一个
+// 布局格式，variable一定要以holder命名，且只有这一个
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
