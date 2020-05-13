@@ -1,11 +1,11 @@
 package com.shouzhong.base.demo
 
 import android.app.Application
-import com.shouzhong.bridge.Bridge
+import com.shouzhong.base.util.BUtils
 
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        Bridge.init(this)
+        BUtils.init(this)
     }
 }

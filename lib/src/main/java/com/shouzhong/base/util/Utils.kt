@@ -34,7 +34,7 @@ import java.lang.reflect.ParameterizedType
 // 扫码、身份证、银行卡等，请关注：https://github.com/shouzhong/Scanner
 // ****************************************************************************************************
 
-private var bApp: Application? = null
+internal var bApp: Application? = null
 
 fun getApp(): Application {
     if (bApp != null) return bApp!!
@@ -148,7 +148,7 @@ fun Any.initDialog(act: AppCompatActivity) {
     val dialogSwitchMap = HashMap<Class<out BDialog<out BViewModel<*>>>, ObservableBoolean>()
     val dialogDataMap = HashMap<Class<out BDialog<out BViewModel<*>>>, Any>()
     val dialogCancelableMap = HashMap<Class<out BDialog<out BViewModel<*>>>, ObservableBoolean>()
-    javaClass.declaredFields?.forEach { field ->
+    javaClass.declaredFields.forEach { field ->
         field.getAnnotation(DialogSwitch::class.java)?.also {
             field.isAccessible = true
             dialogSwitchMap[it.value.java] = field.get(this) as ObservableBoolean
@@ -203,7 +203,7 @@ fun Any.initPopup(act: AppCompatActivity) {
     val popupSwitchMap = HashMap<Class<out BPopup<out BPopupViewModel>>, ObservableBoolean>()
     val popupDataMap = HashMap<Class<out BPopup<out BPopupViewModel>>, BPopupBean>()
     val popupCancelableMap = HashMap<Class<out BPopup<out BPopupViewModel>>, ObservableBoolean>()
-    javaClass.declaredFields?.forEach { field ->
+    javaClass.declaredFields.forEach { field ->
         field.getAnnotation(PopupSwitch::class.java)?.also {
             field.isAccessible = true
             popupSwitchMap[it.value.java] = field.get(this) as ObservableBoolean
