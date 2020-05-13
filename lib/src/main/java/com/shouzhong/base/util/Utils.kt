@@ -36,8 +36,8 @@ import java.lang.reflect.ParameterizedType
 
 private var bApp: Application? = null
 
-fun getApp(): Application? {
-    if (bApp != null) return bApp
+fun getApp(): Application {
+    if (bApp != null) return bApp!!
     bApp = try {
         Class.forName("android.app.ActivityThread").let {
             it.getDeclaredMethod("getApplication").invoke(it.getDeclaredMethod("currentActivityThread").invoke(null))
@@ -45,7 +45,7 @@ fun getApp(): Application? {
     } catch (e: Throwable) {
         null
     }
-    return bApp
+    return bApp!!
 }
 
 ///**
@@ -104,7 +104,7 @@ fun getApp(): Application? {
 //    return list
 //}
 
-fun Intent.startActivity(ctx: Context = getApp()!!, callback: ((Int, Intent?) -> Unit)? = null) {
+fun Intent.startActivity(ctx: Context = getApp(), callback: ((Int, Intent?) -> Unit)? = null) {
     if (callback == null) {
         if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         ctx.startActivity(this)
@@ -121,16 +121,17 @@ fun <T> Any.getGenericClass(index: Int): Class<T>? {
     }
 }
 
-fun Int.resToColor(): Int = getApp()!!.resources!!.getColor(this)
+fun Int.resToColor(): Int = getApp().resources.getColor(this)
 
-fun Int.resToDrawable(): Drawable = getApp()!!.resources!!.getDrawable(this)
+fun Int.resToDrawable(): Drawable = getApp().resources.getDrawable(this)
 
-fun Int.resToDimension(): Float = getApp()!!.resources!!.getDimension(this)
+fun Int.resToDimension(): Float = getApp().resources.getDimension(this)
 
-fun Int.resToString(): String = getApp()!!.resources!!.getString(this)
+fun Int.resToString(): String = getApp().resources.getString(this)
 
 /**
  * View黑白化
+ * 使整个activity黑白化，activity.window.decorView.gray()
  *
  */
 fun View.gray() = setLayerType(View.LAYER_TYPE_HARDWARE, Paint().apply {
@@ -266,7 +267,7 @@ fun Any.initPopup(act: AppCompatActivity) {
  * 如果是安装应用，请加权限：<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
  *
  */
-fun File.openByOtherApp(ctx: Context = getApp()!!, callback: ((Int, Intent?) -> Unit)? = null) {
+fun File.openByOtherApp(ctx: Context = getApp(), callback: ((Int, Intent?) -> Unit)? = null) {
     if (!isFile) return
     val mimeType = absolutePath.toMimeType()
     if (TextUtils.isEmpty(mimeType)) return

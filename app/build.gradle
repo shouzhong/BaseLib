@@ -15,9 +15,9 @@ android {
         versionName "1.0"
     }
 
-    androidExtensions {
-        experimental = true
-    }
+//    androidExtensions {
+//        experimental = true
+//    }
 
     dataBinding {
         enabled = true

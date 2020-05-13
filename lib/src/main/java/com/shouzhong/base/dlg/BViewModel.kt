@@ -41,7 +41,7 @@ abstract class BViewModel<T> : ViewModel(), LifecycleObserver {
 
     inline fun <reified T : ViewDataBinding> getBinding(): T? =
         try {
-            getDialog<BDialog<*>>().binding as T
+            getDialog<BDialog<*>>().getBinding()
         } catch (e: Throwable) {
             null
         }

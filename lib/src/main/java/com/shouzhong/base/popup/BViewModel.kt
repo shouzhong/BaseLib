@@ -41,7 +41,7 @@ abstract class BViewModel<T : BPopupBean> : ViewModel(), LifecycleObserver {
 
     inline fun <reified T : ViewDataBinding> getBinding(): T? =
         try {
-            getPopupWindow<BPopup<*>>().binding as T
+            getPopupWindow<BPopup<*>>().getBinding()
         } catch (e: Throwable) {
             null
         }

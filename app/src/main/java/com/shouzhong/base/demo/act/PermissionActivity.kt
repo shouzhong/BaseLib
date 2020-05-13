@@ -20,6 +20,7 @@ class PermissionViewModel : BViewModel() {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            ctx = getActivity(),
             grantedCallback = { permissionsGranted ->
                 text.set(StringBuffer().apply {
                     append(text.get())
@@ -63,13 +64,6 @@ class PermissionViewModel : BViewModel() {
                     append(text.get())
                     append("simpleDeniedCallback\n\n")
                 })
-            },
-            errorCallback = {
-                text.set(StringBuffer().apply {
-                    append(text.get())
-                    append("errorCallback:$it")
-                    append("\n\n")
-                })
             }
         )
     }
@@ -77,14 +71,12 @@ class PermissionViewModel : BViewModel() {
     fun onClickWriteSettings(v: View) {
         text.set("")
         PermissionUtils.requestWriteSettings(
+            ctx = getActivity(),
             grantedCallback = {
                 text.set("success")
             },
             deniedCallback = {
                 text.set("failure")
-            },
-            errorCallback = {
-                text.set(it)
             }
         )
     }
@@ -92,14 +84,12 @@ class PermissionViewModel : BViewModel() {
     fun onClickOverlay(v: View) {
         text.set("")
         PermissionUtils.requestOverlay(
+            ctx = getActivity(),
             grantedCallback = {
                 text.set("success")
             },
             deniedCallback = {
                 text.set("failure")
-            },
-            errorCallback = {
-                text.set(it)
             }
         )
     }
@@ -107,14 +97,12 @@ class PermissionViewModel : BViewModel() {
     fun onClickNotification(v: View) {
         text.set("")
         PermissionUtils.requestNotification(
+            ctx = getActivity(),
             grantedCallback = {
                 text.set("success")
             },
             deniedCallback = {
                 text.set("failure")
-            },
-            errorCallback = {
-                text.set(it)
             }
         )
     }

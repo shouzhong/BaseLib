@@ -14,8 +14,8 @@ class TestViewModel : BViewModel<TestDialogBean>() {
     }
 }
 
-data class TestDialogBean(
-    val title:  ObservableField<CharSequence> = ObservableField(),
-    val content: ObservableField<CharSequence> = ObservableField(),
+class TestDialogBean {
+    val title:  ObservableField<CharSequence> = ObservableField()
+    val content: ObservableField<CharSequence> = ObservableField()
     val listener: ObservableField<() -> Unit> = ObservableField()
-)
+}

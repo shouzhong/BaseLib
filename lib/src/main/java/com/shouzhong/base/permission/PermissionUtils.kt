@@ -1,29 +1,27 @@
 package com.shouzhong.base.permission
 
+import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.shouzhong.base.util.getApp
 import com.shouzhong.base.util.hashCode
 import com.shouzhong.base.util.startActivity
-import com.shouzhong.bridge.ActivityStack
-import com.shouzhong.bridge.EventBusUtils
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 class PermissionUtils private constructor(){
     companion object {
         fun getPermissions(): List<String> {
             val list = ArrayList<String>()
             try {
-                val permissions = getApp()?.packageManager?.getPackageInfo(getApp()?.packageName, PackageManager.GET_PERMISSIONS)?.requestedPermissions
-                for (permission in permissions!!) {
+                val permissions = getApp().packageManager.getPackageInfo(getApp().packageName, PackageManager.GET_PERMISSIONS)?.requestedPermissions ?: return list
+                for (permission in permissions) {
                     list.add(permission)
                 }
             } catch (e: Throwable) {}
@@ -39,16 +37,16 @@ class PermissionUtils private constructor(){
 
         private fun isGranted(permission: String): Boolean {
             return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
-                    || PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(getApp()!!, permission)
+                    || PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(getApp(), permission)
         }
 
         fun requestPermission(
             vararg permissions: String,
+            ctx: Context? = null,
             grantedCallback: ((permissionsGranted: List<String>) -> Unit)? = null,
             deniedCallback: ((permissionsDenied: List<String>, permissionsDeniedForever: List<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null,
             simpleGrantedCallback: (() -> Unit)? = null,
-            simpleDeniedCallback: (() -> Unit)? = null,
-            errorCallback: ((errorMessage: String) -> Unit)? = null
+            simpleDeniedCallback: (() -> Unit)? = null
         ) {
             PermissionUtils().apply {
                 this.type = 0
@@ -57,16 +55,15 @@ class PermissionUtils private constructor(){
                 this.deniedCallback = deniedCallback
                 this.simpleGrantedCallback = simpleGrantedCallback
                 this.simpleDeniedCallback = simpleDeniedCallback
-                this.errorCallback = errorCallback
-            }.request()
+            }.request(ctx)
         }
 
-        fun isGrantedWriteSettings(): Boolean  = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.System.canWrite(getApp()!!)
+        fun isGrantedWriteSettings(): Boolean  = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.System.canWrite(getApp())
 
         fun requestWriteSettings(
+            ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
-            deniedCallback: (() -> Unit)? = null,
-            errorCallback: ((errorMessage: String) -> Unit)? = null
+            deniedCallback: (() -> Unit)? = null
         ) {
             if (isGrantedWriteSettings()) {
                 grantedCallback?.invoke()
@@ -76,16 +73,15 @@ class PermissionUtils private constructor(){
                 this.type = 1
                 this.simpleGrantedCallback = grantedCallback
                 this.simpleDeniedCallback = deniedCallback
-                this.errorCallback = errorCallback
-            }.request()
+            }.request(ctx)
         }
 
-        fun isGrantedOverlay(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(getApp()!!)
+        fun isGrantedOverlay(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(getApp())
 
         fun requestOverlay(
+            ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
-            deniedCallback: (() -> Unit)? = null,
-            errorCallback: ((errorMessage: String) -> Unit)? = null
+            deniedCallback: (() -> Unit)? = null
         ) {
             if (isGrantedOverlay()) {
                 grantedCallback?.invoke()
@@ -95,16 +91,15 @@ class PermissionUtils private constructor(){
                 this.type = 2
                 this.simpleGrantedCallback = grantedCallback
                 this.simpleDeniedCallback = deniedCallback
-                this.errorCallback = errorCallback
-            }.request()
+            }.request(ctx)
         }
 
-        fun isGrantedNotification(): Boolean = NotificationManagerCompat.from(getApp()!!).areNotificationsEnabled()
+        fun isGrantedNotification(): Boolean = NotificationManagerCompat.from(getApp()).areNotificationsEnabled()
 
         fun requestNotification(
+            ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
-            deniedCallback: (() -> Unit)? = null,
-            errorCallback: ((String) -> Unit)? = null
+            deniedCallback: (() -> Unit)? = null
         ) {
             if (isGrantedNotification()) {
                 grantedCallback?.invoke()
@@ -114,18 +109,16 @@ class PermissionUtils private constructor(){
                 this.type = 3
                 this.simpleGrantedCallback = grantedCallback
                 this.simpleDeniedCallback = deniedCallback
-                this.errorCallback = errorCallback
-            }.request()
+            }.request(ctx)
         }
 
         fun launchAppDetailsSettings() {
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:${getApp()!!.packageName}")
+                data = Uri.parse("package:${getApp().packageName}")
             }.startActivity()
         }
     }
 
-    private var flag: Boolean = false
     private val uniqueId = hashCode(this)
     private var type: Int = 0
     private var permissions: Array<out String>? = null
@@ -133,47 +126,31 @@ class PermissionUtils private constructor(){
     private var deniedCallback: ((permissionsDenied: List<String>, permissionsDeniedForever: List<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null
     private var simpleGrantedCallback: (() -> Unit)? = null
     private var simpleDeniedCallback: (() -> Unit)? = null
-    private var errorCallback: ((errorMessage: String) -> Unit)? = null
 
-    private fun request() {
-        if (type == 0 && permissions?.isNotEmpty() != true) {
-            errorCallback?.invoke("permission is null")
-            return
-        }
-        EventBusUtils.register(this)
-        try {
-            Intent(getApp(), PermissionActivity::class.java).apply {
+    private fun request(ctx: Context?) {
+        require(type != 0 || permissions?.isNotEmpty() == true) { "permission is null" }
+        getApp().registerReceiver(
+            object : BroadcastReceiver() {
+                override fun onReceive(context: Context?, intent: Intent?) {
+                    getApp().unregisterReceiver(this)
+                    val data = intent?.getParcelableExtra<PermissionBean>("data") ?: return
+                    if (type == 0) {
+                        grantedCallback?.invoke(data.permissionsGranted)
+                        deniedCallback?.invoke(data.permissionsDenied, data.permissionsDeniedForever, data.permissionsUndefined)
+                    }
+                    if (data.isGranted) simpleGrantedCallback?.invoke()
+                    else simpleDeniedCallback?.invoke()
+                }
+            },
+            IntentFilter("${getApp().packageName}.shouzhong.receiver.action.REQUEST_PERMISSION_$uniqueId")
+        )
+        (ctx ?: getApp()).startActivity(
+            Intent(ctx ?: getApp(), PermissionActivity::class.java).apply {
+                if (ctx == null || ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("type", this@PermissionUtils.type)
                 putExtra("unique_id", this@PermissionUtils.uniqueId)
                 putExtra("data", this@PermissionUtils.permissions)
-            }.startActivity()
-        } catch (e: Throwable) { }
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (flag || ActivityStack.contains(PermissionActivity::class.java)) return@postDelayed
-            EventBusUtils.unregister(this@PermissionUtils)
-            errorCallback?.invoke("launcher failure")
-        }, 500)
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun a(data: PermissionBean) {
-        if (data.uniqueId != uniqueId || data.type != type) return
-        flag = true
-        EventBusUtils.unregister(this)
-        if (type == 0) {
-            grantedCallback?.invoke(data.permissionsGranted)
-            deniedCallback?.invoke(data.permissionsDenied, data.permissionsDeniedForever, data.permissionsUndefined)
-            if (data.permissionsDenied.isEmpty() && data.permissionsDeniedForever.isEmpty() && data.permissionsUndefined.isEmpty()) {
-                simpleGrantedCallback?.invoke()
-            } else {
-                simpleDeniedCallback?.invoke()
             }
-            return
-        }
-        if (type == 1 || type == 2 || type == 3) {
-            if (data.isGranted) simpleGrantedCallback?.invoke()
-            else simpleDeniedCallback?.invoke()
-            return
-        }
+        )
     }
 }

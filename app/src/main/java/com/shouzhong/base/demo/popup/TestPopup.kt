@@ -15,7 +15,7 @@ class TestViewModel : BViewModel<TestPopupBean>() {
     }
 }
 
-data class TestPopupBean(
-    val title:  ObservableField<CharSequence> = ObservableField(),
+class TestPopupBean : BPopupBean() {
+    val title:  ObservableField<CharSequence> = ObservableField()
     val listener: ObservableField<() -> Unit> = ObservableField()
-) : BPopupBean()
+}

@@ -14,17 +14,17 @@ import com.shouzhong.base.util.initPopup
 import com.shouzhong.bridge.ActivityStack
 
 abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity() {
-    var binding: ViewDataBinding? = null
+    var viewDataBinding: ViewDataBinding? = null
         private set
     private var vm: T? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 //        savedInstanceState?.putParcelable("android:support:fragments", null)
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, layoutId)
-        binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>( 0))?.apply {
+        viewDataBinding = DataBindingUtil.setContentView(this, layoutId)
+        viewDataBinding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>( 0))?.apply {
             isAccessible = true
-            invoke(binding, getVm())
+            invoke(viewDataBinding, getVm())
         }
         lifecycle.addObserver(vm!!)
         vm?.onCreate(savedInstanceState)
@@ -59,8 +59,8 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
         super.onDestroy()
         vm?.onDestroy()
         vm = null
-        binding?.unbind()
-        binding = null
+        viewDataBinding?.unbind()
+        viewDataBinding = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -104,5 +104,10 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
         vm?.initPopup(this)
         vm?.init()
         return vm!!
+    }
+
+    inline fun <reified T : ViewDataBinding> getBinding(): T? = when(viewDataBinding) {
+        is T -> viewDataBinding as T
+        else -> null
     }
 }

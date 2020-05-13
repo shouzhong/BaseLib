@@ -15,7 +15,7 @@ import com.shouzhong.base.util.*
 import com.shouzhong.bridge.FragmentStack
 
 abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() {
-    var binding: ViewDataBinding? = null
+    var viewDataBinding: ViewDataBinding? = null
         private set
     private var vm: T? = null
 
@@ -58,12 +58,12 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
-        binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
+        viewDataBinding = DataBindingUtil.inflate(inflater, layoutId, container, false)
+        viewDataBinding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
             isAccessible = true
-            invoke(binding, vm)
+            invoke(viewDataBinding, vm)
         }
-        return binding?.root
+        return viewDataBinding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,8 +106,8 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         dialog?.setOnCancelListener(null)
         super.onDestroyView()
         vm?.onDestroyView()
-        binding?.unbind()
-        binding = null
+        viewDataBinding?.unbind()
+        viewDataBinding = null
     }
 
     override fun onDestroy() {
@@ -128,6 +128,11 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         vm?.setData(data)
         vm?.init()
         return vm!!
+    }
+
+    inline fun <reified T : ViewDataBinding> getBinding(): T? = when(viewDataBinding) {
+        is T -> viewDataBinding as T
+        else -> null
     }
 
     open fun initAttributes(attr: WindowManager.LayoutParams?) = Unit

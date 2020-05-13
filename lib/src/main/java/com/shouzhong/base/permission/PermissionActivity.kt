@@ -3,17 +3,18 @@ package com.shouzhong.base.permission
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.shouzhong.base.util.startActivity
-import com.shouzhong.bridge.EventBusUtils
+import com.shouzhong.base.util.getApp
 
 class PermissionActivity : AppCompatActivity() {
+    var uniqueId: Int = 0
+    var type: Int = 0
+    val permissionsRequest = ArrayList<String>()
     val data: PermissionBean = PermissionBean()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,9 +27,9 @@ class PermissionActivity : AppCompatActivity() {
             height = 1
             width = 1
         }
-        data.uniqueId = intent.getIntExtra("unique_id", 0)
-        data.type = intent.getIntExtra("type", 0)
-        if (data.type == 0) {
+        uniqueId = intent.getIntExtra("unique_id", 0)
+        type = intent.getIntExtra("type", 0)
+        if (type == 0) {
             val temp = intent.getStringArrayExtra("data")
             val permissions = PermissionUtils.getPermissions()
             for (permission in temp) {
@@ -40,43 +41,45 @@ class PermissionActivity : AppCompatActivity() {
                     data.permissionsGranted.add(permission)
                     continue
                 }
-                data.permissionsRequest.add(permission)
+                permissionsRequest.add(permission)
             }
-            if (data.permissionsRequest.isEmpty()) {
-                EventBusUtils.post(data)
-                finish()
+            if (permissionsRequest.isEmpty()) {
+                data.isGranted = data.permissionsDenied.isEmpty() && data.permissionsDeniedForever.isEmpty() && data.permissionsUndefined.isEmpty()
+                sendResult()
                 return
             }
-            val request = arrayOfNulls<String>(data.permissionsRequest.size)
-            for (i in request.indices) {
-                request[i] = data.permissionsRequest[i]
-            }
-            ActivityCompat.requestPermissions(this, request, 0)
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsRequest.toArray(arrayOfNulls<String>(permissionsRequest.size)),
+                uniqueId and 0xffff
+            )
             return
         }
-        try {
-            Intent(
-                when (data.type) {
+        startActivityForResult(
+            Intent().apply {
+                action = when (this@PermissionActivity.type) {
                     1 -> Settings.ACTION_MANAGE_WRITE_SETTINGS
                     2 -> Settings.ACTION_MANAGE_OVERLAY_PERMISSION
                     3 -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                     else -> null
                 }
-            ).apply {
                 data = Uri.parse("package:$packageName")
-            }.startActivity(this) { _, _ ->
-                data.isGranted = when (data.type) {
-                    1 -> PermissionUtils.isGrantedWriteSettings()
-                    2 -> PermissionUtils.isGrantedOverlay()
-                    3 -> PermissionUtils.isGrantedNotification()
-                    else -> false
-                }
-                EventBusUtils.post(data)
-                finish()
+            },
+            uniqueId and 0xffff
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == (uniqueId and 0xffff)) {
+            this.data.isGranted = when (this.type) {
+                1 -> PermissionUtils.isGrantedWriteSettings()
+                2 -> PermissionUtils.isGrantedOverlay()
+                3 -> PermissionUtils.isGrantedNotification()
+                else -> false
             }
-        } catch (e: Throwable) {
-            EventBusUtils.post(data)
-            finish()
+            sendResult()
+            return
         }
     }
 
@@ -86,19 +89,31 @@ class PermissionActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode != 0) return
-        for (i in permissions.indices) {
-            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                data.permissionsGranted.add(permissions[i])
-                continue
+        if (requestCode == (uniqueId and 0xffff)) {
+            for (i in permissions.indices) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    data.permissionsGranted.add(permissions[i])
+                    continue
+                }
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i])) {
+                    data.permissionsDenied.add(permissions[i])
+                    continue
+                }
+                data.permissionsDeniedForever.add(permissions[i])
             }
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i])) {
-                data.permissionsDenied.add(permissions[i])
-                continue
-            }
-            data.permissionsDeniedForever.add(permissions[i])
+            data.isGranted = data.permissionsDenied.isEmpty() && data.permissionsDeniedForever.isEmpty() && data.permissionsUndefined.isEmpty()
+            sendResult()
+            return
         }
-        EventBusUtils.post(data)
+    }
+
+    private fun sendResult() {
+        getApp().sendBroadcast(
+            Intent().apply {
+                action = "${getApp().packageName}.shouzhong.receiver.action.REQUEST_PERMISSION_$uniqueId"
+                putExtra("data", this@PermissionActivity.data)
+            }
+        )
         finish()
     }
 }

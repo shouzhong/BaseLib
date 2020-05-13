@@ -36,7 +36,7 @@ class MainViewModel : BViewModel() {
     fun onClickRequest(view: View) {
 //        RequestUtils.startActivityForResult(
 //            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-//                data = Uri.parse("package:${getApp()!!.packageName}")
+//                data = Uri.parse("package:${getApp().packageName}")
 //            }
 //        ) { resultCode, data ->
 //            text.set("${resultCode}->${data?.getStringExtra("data")}")

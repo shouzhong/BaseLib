@@ -49,7 +49,7 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
 
     inline fun <reified T : ViewDataBinding> getBinding(): T? =
         try {
-            getFragment<BFragment<*>>().binding as T
+            getFragment<BFragment<*>>().getBinding()
         } catch (e: Throwable) {
             null
         }

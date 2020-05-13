@@ -30,6 +30,8 @@
         <activity android:name=".act.PopupActivity" />
         <activity android:name=".act.PermissionActivity" />
         <activity android:name=".act.RequestActivity" />
+
+        <service android:name=".TestService" />
     </application>
 
 </manifest>

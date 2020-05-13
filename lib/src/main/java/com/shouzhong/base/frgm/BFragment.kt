@@ -15,7 +15,7 @@ import com.shouzhong.base.util.*
 import com.shouzhong.bridge.FragmentStack
 
 abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
-    var binding: ViewDataBinding? = null
+    var viewDataBinding: ViewDataBinding? = null
         private set
     private var vm: T? = null
     private var isFirst = false
@@ -32,13 +32,13 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        if (binding != null) return binding!!.root
-        binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
-        binding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
+        if (viewDataBinding != null) return viewDataBinding!!.root
+        viewDataBinding = DataBindingUtil.inflate(inflater, layoutId, container, false)
+        viewDataBinding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
             isAccessible = true
-            invoke(binding, vm)
+            invoke(viewDataBinding, vm)
         }
-        return binding?.root
+        return viewDataBinding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,8 +86,8 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         vm?.onDestroyView()
         isFirst = false
         isFirstVisible = false
-        binding?.unbind()
-        binding = null
+        viewDataBinding?.unbind()
+        viewDataBinding = null
     }
 
     override fun onDestroy() {
@@ -141,5 +141,10 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         }
         vm?.init()
         return vm!!
+    }
+
+    inline fun <reified T : ViewDataBinding> getBinding(): T? = when(viewDataBinding) {
+        is T -> viewDataBinding as T
+        else -> null
     }
 }

@@ -13,17 +13,18 @@ class RequestActivity : AppCompatActivity() {
         uniqueId = intent.getIntExtra("unique_id", 0)
         startActivityForResult(
             intent.getParcelableExtra("data")!!,
-            uniqueId and 0x0000ffff
+            uniqueId and 0xffff
         )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == (uniqueId and 0x0000ffff)) {
-            getApp()!!.sendBroadcast(
-                Intent("${getApp()!!.packageName}.shouzhong.receiver.action.START_ACTIVITY_FOR_RESULT_$uniqueId").apply {
+            getApp().sendBroadcast(
+                Intent().apply {
+                    action = "${getApp().packageName}.shouzhong.receiver.action.START_ACTIVITY_FOR_RESULT_$uniqueId"
                     putExtra("result_code", resultCode)
-                    if (data != null) putExtra("data", data)
+                    putExtra("data", data)
                 }
             )
             finish()

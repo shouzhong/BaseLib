@@ -27,22 +27,20 @@ class RequestUtils private constructor() {
     private lateinit var callback: (resultCode: Int, data: Intent?) -> Unit
 
     private fun start(ctx: Context?) {
-        getApp()!!.registerReceiver(
+        getApp().registerReceiver(
             object : BroadcastReceiver() {
                 override fun onReceive(context: Context?, intent: Intent?) {
-                    getApp()!!.unregisterReceiver(this)
+                    getApp().unregisterReceiver(this)
                     callback.invoke(
                         intent?.getIntExtra("result_code", 0) ?: Activity.RESULT_CANCELED,
-                        if (intent?.getParcelableExtra<Intent>("data") != null) {
-                            intent.getParcelableExtra("data")!!
-                        } else null
+                        intent?.getParcelableExtra("data")
                     )
                 }
             },
-            IntentFilter("${getApp()!!.packageName}.shouzhong.receiver.action.START_ACTIVITY_FOR_RESULT_$uniqueId")
+            IntentFilter("${getApp().packageName}.shouzhong.receiver.action.START_ACTIVITY_FOR_RESULT_$uniqueId")
         )
-        (ctx ?: getApp()!!).startActivity(
-            Intent(getApp()!!, RequestActivity::class.java).apply {
+        (ctx ?: getApp()).startActivity(
+            Intent(ctx ?: getApp(), RequestActivity::class.java).apply {
                 if (ctx == null || ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("unique_id", uniqueId)
                 putExtra("data", intent)

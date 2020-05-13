@@ -46,7 +46,7 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
 
     inline fun <reified T : ViewDataBinding> getBinding(): T? =
         try {
-            getActivity<BActivity<*>>().binding as T
+            getActivity<BActivity<*>>().getBinding()
         } catch (e: Throwable) {
             null
         }
