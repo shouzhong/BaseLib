@@ -188,3 +188,7 @@ PermissionUtils.requestPermission(
 // 等等
 ```
 看到这，你可能不是很明白，请参考[demo](https://github.com/shouzhong/BaseLib/tree/master/app/src/main)和[源码](https://github.com/shouzhong/BaseLib/tree/master/lib/src/main)
+## 你可能用的上的
+[Bridge](https://github.com/shouzhong/Bridge)，本项目已集成
+[ScreenHelper](https://github.com/shouzhong/ScreenHelper)
+[Scanner](https://github.com/shouzhong/Scanner)
