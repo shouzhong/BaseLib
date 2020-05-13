@@ -164,7 +164,7 @@ val yourPopupCancelable = ObservableBoolean(false)
 Intent(...).apply {
     ...
 }
-.startActivity() { resultCode, data ->
+.startActivity { resultCode, data ->
 }
 // permission
 PermissionUtils.requestPermission(
