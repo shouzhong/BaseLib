@@ -189,6 +189,6 @@ PermissionUtils.requestPermission(
 ```
 看到这，你可能不是很明白，请参考[demo](https://github.com/shouzhong/BaseLib/tree/master/app/src/main)和[源码](https://github.com/shouzhong/BaseLib/tree/master/lib/src/main)
 ## 你可能用的上的
-### [Bridge](https://github.com/shouzhong/Bridge)，一个跨进程管理库，本项目已集成
-### [ScreenHelper](https://github.com/shouzhong/ScreenHelper)，屏幕适配库
-### [Scanner](https://github.com/shouzhong/Scanner)，扫描识别库
+#### [Bridge](https://github.com/shouzhong/Bridge)，跨进程管理库，本项目已集成
+#### [ScreenHelper](https://github.com/shouzhong/ScreenHelper)，屏幕适配库
+#### [Scanner](https://github.com/shouzhong/Scanner)，扫描识别库
