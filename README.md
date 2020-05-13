@@ -93,5 +93,98 @@ class YourBinder : BBinder<YourBean, YourHolder>(R.layout.布局id)
 </layout>
 ```
 在Dialog中使用
+```
+// 首先创建ViewModel
+class YourViewModel : BViewModel<YourBean>()
+// 然后创建Dialog
+class YourDialog : BDialog<YourViewModel>(R.layout.布局id)
+// 布局格式，variable一定要以vm命名，且只有这一个
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="vm"
+            type="YourViewMode路径" />
+    </data>
 
-[具体请参考demo](https://github.com/shouzhong/BaseLib/tree/master/app/src/main)
+    <LinearLayout
+        ...>
+        ...
+    </LinearLayout>
+</layout>
+// 在Activity和Fragment中使用用，在其ViewModel中
+// 开关
+@DialogSwitch(YourDialog::class)
+val yourDialogSwitch = ObservableBoolean(false)
+// 数据
+@DialogData(YourDialog::class)
+val yourDialogData = YourDialogBean()
+// 是否点击屏幕外或者返回键可关闭，非必须，默认true
+@DialogCancelable(YourDialog::class)
+val yourDialogCancelable = ObservableBoolean(false)
+// 如果你想在其他地方使用，请在其中调用initDialog(appCompatActivity)
+```
+在PopupWindow中使用
+```
+// 首先创建数据
+class YourBean : BPopupBean()
+// 然后创建ViewModel
+class YourViewModel : BViewModel<YourBean>()
+// 再创建PopupWindow
+class YourPopup : BPopup<YourViewModel>(R.layout.布局id)
+// 布局格式，variable一定要以vm命名，且只有这一个
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="vm"
+            type="YourViewMode路径" />
+    </data>
+
+    <LinearLayout
+        ...>
+        ...
+    </LinearLayout>
+</layout>
+// 在Activity和Fragment中使用用，在其ViewModel中
+@PopupSwitch(YourPopup::class)
+val yourPopupSwitch = ObservableBoolean(false)
+@PopupData(YourPopup::class)
+val yourPopupData = YourPopupBean()
+// 是否点击屏幕外或者返回键可关闭，非必须，默认true
+@PopupCancelable(YourPopup::class)
+val yourPopupCancelable = ObservableBoolean(false)
+// 如果你想在其他地方使用，请在其中调用initPopup(appCompatActivity)
+```
+其他
+```
+// startActivityForResult
+Intent(...).apply {
+    ...
+}
+.startActivity() { resultCode, data ->
+}
+// permission
+PermissionUtils.requestPermission(
+    Manifest.permission.CAMERA,
+    Manifest.permission.ACCESS_FINE_LOCATION,
+    Manifest.permission.ACCESS_COARSE_LOCATION,
+    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+    grantedCallback = { permissionsGranted ->
+        ...
+    },
+    deniedCallback = { permissionsDenied, permissionsDeniedForever, permissionsUndefined ->
+        ...
+    },
+    simpleGrantedCallback = {
+        ...
+    },
+    simpleDeniedCallback = {
+        ...
+    }
+)
+// 等等
+```
+看到这，你可能不是很明白，请参考[demo](https://github.com/shouzhong/BaseLib/tree/master/app/src/main)和[源码](https://github.com/shouzhong/BaseLib/tree/master/lib/src/main)
