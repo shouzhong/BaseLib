@@ -104,6 +104,10 @@ fun getApp(): Application {
 //    return list
 //}
 
+/**
+ * 将startActivity和startActivityForResult合并，回调[callback]
+ *
+ */
 fun Intent.startActivity(ctx: Context = getApp(), callback: ((Int, Intent?) -> Unit)? = null) {
     if (callback == null) {
         if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -113,6 +117,10 @@ fun Intent.startActivity(ctx: Context = getApp(), callback: ((Int, Intent?) -> U
     RequestUtils.startActivityForResult(ctx, this, callback)
 }
 
+/**
+ * 获取泛型类型
+ *
+ */
 fun <T> Any.getGenericClass(index: Int): Class<T>? {
     return try {
         (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[index] as Class<T>
@@ -121,12 +129,28 @@ fun <T> Any.getGenericClass(index: Int): Class<T>? {
     }
 }
 
+/**
+ * 获取颜色资源
+ *
+ */
 fun Int.resToColor(): Int = getApp().resources.getColor(this)
 
+/**
+ * 获取图片资源
+ *
+ */
 fun Int.resToDrawable(): Drawable = getApp().resources.getDrawable(this)
 
+/**
+ * 获取尺寸资源
+ *
+ */
 fun Int.resToDimension(): Float = getApp().resources.getDimension(this)
 
+/**
+ * 获取字符串资源
+ *
+ */
 fun Int.resToString(): String = getApp().resources.getString(this)
 
 /**
@@ -293,7 +317,7 @@ fun String.toMimeType(): String? {
 }
 
 /**
- * 获取hashdode
+ * 获取hashCode
  *
  */
 fun hashCode(obj: Any): Int {

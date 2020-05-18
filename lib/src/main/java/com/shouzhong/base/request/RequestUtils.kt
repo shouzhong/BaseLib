@@ -8,6 +8,10 @@ import android.content.IntentFilter
 import com.shouzhong.base.util.getApp
 import com.shouzhong.base.util.hashCode
 
+/**
+ * 实现在任何地方调用startActivityForResult
+ *
+ */
 class RequestUtils private constructor() {
     companion object {
         fun startActivityForResult(

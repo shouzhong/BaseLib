@@ -4,8 +4,11 @@ import androidx.databinding.ObservableInt
 import com.drakeet.multitype.MultiTypeAdapter
 
 class DataList : ArrayList<Any>() {
+    // rv适配器
     val adapter = MultiTypeAdapter(this)
+    // 数据长度
     val length = ObservableInt(size)
+    // 是否在增删改的时候刷新
     var isRefresh: Boolean = true
 
     override fun add(element: Any): Boolean {

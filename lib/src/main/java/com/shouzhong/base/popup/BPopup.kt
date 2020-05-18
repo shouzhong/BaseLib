@@ -12,6 +12,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.shouzhong.base.util.getGenericClass
 import com.shouzhong.bridge.FragmentStack
 
+/**
+ * PopupWindow基类
+ *
+ */
 open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
     var viewDataBinding: ViewDataBinding? = null
         private set
