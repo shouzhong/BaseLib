@@ -15,8 +15,16 @@ import com.shouzhong.base.util.getApp
 import com.shouzhong.base.util.hashCode
 import com.shouzhong.base.util.startActivity
 
+/**
+ * 权限管理
+ *
+ */
 class PermissionUtils private constructor(){
     companion object {
+        /**
+         * 获取注册的所有权限
+         *
+         */
         fun getPermissions(): List<String> {
             val list = ArrayList<String>()
             try {
@@ -28,6 +36,10 @@ class PermissionUtils private constructor(){
             return list
         }
 
+        /**
+         * 是否有权限
+         *
+         */
         fun isGranted(vararg permissions: String): Boolean {
             for (permission in permissions) {
                 if (!isGranted(permission)) return false
@@ -35,11 +47,24 @@ class PermissionUtils private constructor(){
             return true
         }
 
+        /**
+         * 是否有权限
+         *
+         */
         private fun isGranted(permission: String): Boolean {
             return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
                     || PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(getApp(), permission)
         }
 
+        /**
+         * 申请权限
+         * [permissions]所有申请的权限
+         * [grantedCallback]授予权限回调
+         * [deniedCallback]拒绝权限回调
+         * [simpleGrantedCallback]授予权限简单回调
+         * [simpleDeniedCallback]拒绝权限简单回调
+         *
+         */
         fun requestPermission(
             vararg permissions: String,
             ctx: Context? = null,
@@ -58,8 +83,16 @@ class PermissionUtils private constructor(){
             }.request(ctx)
         }
 
+        /**
+         * 是否有修改系统权限
+         *
+         */
         fun isGrantedWriteSettings(): Boolean  = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.System.canWrite(getApp())
 
+        /**
+         * 申请修改系统权限
+         *
+         */
         fun requestWriteSettings(
             ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
@@ -76,8 +109,16 @@ class PermissionUtils private constructor(){
             }.request(ctx)
         }
 
+        /**
+         * 是否有悬浮窗权限
+         *
+         */
         fun isGrantedOverlay(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(getApp())
 
+        /**
+         * 申请悬浮窗权限
+         *
+         */
         fun requestOverlay(
             ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
@@ -94,8 +135,16 @@ class PermissionUtils private constructor(){
             }.request(ctx)
         }
 
+        /**
+         * 是否有通知权限
+         *
+         */
         fun isGrantedNotification(): Boolean = NotificationManagerCompat.from(getApp()).areNotificationsEnabled()
 
+        /**
+         * 申请通知权限
+         *
+         */
         fun requestNotification(
             ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
@@ -112,6 +161,10 @@ class PermissionUtils private constructor(){
             }.request(ctx)
         }
 
+        /**
+         * 打开应用具体设置
+         *
+         */
         fun launchAppDetailsSettings() {
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.parse("package:${getApp().packageName}")
