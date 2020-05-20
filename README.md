@@ -160,11 +160,8 @@ val yourPopupCancelable = ObservableBoolean(false)
 ```
 其他
 ```
-// startActivityForResult
-Intent(...).apply {
-    ...
-}
-.startActivity { resultCode, data ->
+// startActivity或startActivityForResult
+Intent.startActivity
 }
 // permission
 String.permissionRequest
