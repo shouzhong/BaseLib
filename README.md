@@ -167,24 +167,9 @@ Intent(...).apply {
 .startActivity { resultCode, data ->
 }
 // permission
-PermissionUtils.requestPermission(
-    Manifest.permission.CAMERA,
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.ACCESS_COARSE_LOCATION,
-    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-    grantedCallback = { permissionsGranted ->
-        ...
-    },
-    deniedCallback = { permissionsDenied, permissionsDeniedForever, permissionsUndefined ->
-        ...
-    },
-    simpleGrantedCallback = {
-        ...
-    },
-    simpleDeniedCallback = {
-        ...
-    }
-)
+String.permissionRequest
+Array<String>.permissionRequest
+ArrayList<String>.permissionRequest
 // 等等
 ```
 看到这，你可能不是很明白，请参考[demo](https://github.com/shouzhong/BaseLib/tree/master/app/src/main)和[源码](https://github.com/shouzhong/BaseLib/tree/master/lib/src/main)
