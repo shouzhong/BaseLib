@@ -12,10 +12,10 @@ import androidx.core.content.ContextCompat
 import com.shouzhong.base.util.getApp
 
 class PermissionActivity : AppCompatActivity() {
-    var uniqueId: Int = 0
-    var type: Int = 0
-    val permissionsRequest = ArrayList<String>()
-    val data: PermissionBean = PermissionBean()
+    private var uniqueId: Int = 0
+    private var type: Int = 0
+    private val permissionsRequest = arrayListOf<String>()
+    private val data: PermissionBean = PermissionBean()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +28,12 @@ class PermissionActivity : AppCompatActivity() {
             width = 1
         }
         uniqueId = intent.getIntExtra("unique_id", 0)
+        getApp().sendBroadcast(
+            Intent().apply {
+                action = "${getApp().packageName}.shouzhong.receiver.action.REQUEST_PERMISSION_$uniqueId"
+                putExtra("flag", true)
+            }
+        )
         type = intent.getIntExtra("type", 0)
         if (type == 0) {
             val temp = intent.getStringArrayExtra("data")

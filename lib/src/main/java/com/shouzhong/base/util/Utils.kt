@@ -20,6 +20,7 @@ import androidx.databinding.ObservableBoolean
 import com.shouzhong.base.annotation.*
 import com.shouzhong.base.dlg.BDialog
 import com.shouzhong.base.dlg.BViewModel
+import com.shouzhong.base.permission.PermissionUtils
 import com.shouzhong.base.popup.BPopup
 import com.shouzhong.base.popup.BPopupBean
 import com.shouzhong.base.popup.PopupFragment
@@ -105,10 +106,13 @@ fun getApp(): Application {
 //}
 
 /**
- * 将startActivity和startActivityForResult合并，回调[callback]
+ * 将startActivity和startActivityForResult合并，在[callback]回调，某些机型在后台需要权限才能打开activity，对于这种情况（只针对不传AppCompatActivity）在[error]中回调
  *
  */
-fun Intent.startActivity(ctx: Context = getApp(), callback: ((Int, Intent?) -> Unit)? = null) {
+fun Intent.startActivity(
+    ctx: Context = getApp(),
+    callback: ((resultCode: Int, data: Intent?) -> Unit)? = null
+) {
     if (callback == null) {
         if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         ctx.startActivity(this)
@@ -118,10 +122,75 @@ fun Intent.startActivity(ctx: Context = getApp(), callback: ((Int, Intent?) -> U
 }
 
 /**
+ * 请求权限
+ *
+ */
+fun String.permissionRequest(
+    ctx: Context = getApp(),
+    grantedCallback: ((permissionsGranted: ArrayList<String>) -> Unit)? = null,
+    deniedCallback: ((permissionsDenied: ArrayList<String>, permissionsDeniedForever: ArrayList<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null,
+    simpleGrantedCallback: (() -> Unit)? = null,
+    simpleDeniedCallback: (() -> Unit)? = null
+) {
+    PermissionUtils.requestPermission(
+        this,
+        ctx = ctx,
+        grantedCallback = grantedCallback,
+        deniedCallback = deniedCallback,
+        simpleGrantedCallback = simpleGrantedCallback,
+        simpleDeniedCallback = simpleDeniedCallback
+    )
+}
+
+/**
+ * 请求权限
+ *
+ */
+fun Array<String>.permissionRequest(
+    ctx: Context = getApp(),
+    grantedCallback: ((permissionsGranted: ArrayList<String>) -> Unit)? = null,
+    deniedCallback: ((permissionsDenied: ArrayList<String>, permissionsDeniedForever: ArrayList<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null,
+    simpleGrantedCallback: (() -> Unit)? = null,
+    simpleDeniedCallback: (() -> Unit)? = null
+) {
+    PermissionUtils.requestPermission(
+        permissions = *this,
+        ctx = ctx,
+        grantedCallback = grantedCallback,
+        deniedCallback = deniedCallback,
+        simpleGrantedCallback = simpleGrantedCallback,
+        simpleDeniedCallback = simpleDeniedCallback
+    )
+}
+
+/**
+ * 请求权限
+ *
+ */
+fun ArrayList<String>.permissionRequest(
+    ctx: Context = getApp(),
+    grantedCallback: ((permissionsGranted: ArrayList<String>) -> Unit)? = null,
+    deniedCallback: ((permissionsDenied: ArrayList<String>, permissionsDeniedForever: ArrayList<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null,
+    simpleGrantedCallback: (() -> Unit)? = null,
+    simpleDeniedCallback: (() -> Unit)? = null
+) {
+    PermissionUtils.requestPermission(
+        permissions = *(this.toArray(arrayOfNulls<String>(this.size)) as Array<out String>),
+        ctx = ctx,
+        grantedCallback = grantedCallback,
+        deniedCallback = deniedCallback,
+        simpleGrantedCallback = simpleGrantedCallback,
+        simpleDeniedCallback = simpleDeniedCallback
+    )
+}
+
+/**
  * 获取泛型类型
  *
  */
-fun <T> Any.getGenericClass(index: Int): Class<T>? {
+fun <T> Any.getGenericClass(
+    index: Int
+): Class<T>? {
     return try {
         (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[index] as Class<T>
     } catch (e: Throwable) {

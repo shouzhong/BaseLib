@@ -43,7 +43,7 @@ class MainViewModel : BViewModel() {
 //        }
         Intent(getActivity(), RequestActivity::class.java).apply {
             putExtra("data", "这是来自MainActivity的数据")
-        }.startActivity(getActivity()) { resultCode, data ->
+        }.startActivity { resultCode, data ->
             text.set("${resultCode}->${data?.getStringExtra("data")}")
         }
     }

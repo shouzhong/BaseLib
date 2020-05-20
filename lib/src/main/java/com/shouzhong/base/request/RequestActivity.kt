@@ -11,6 +11,12 @@ class RequestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         uniqueId = intent.getIntExtra("unique_id", 0)
+        getApp().sendBroadcast(
+            Intent().apply {
+                action = "${getApp().packageName}.shouzhong.receiver.action.START_ACTIVITY_FOR_RESULT_$uniqueId"
+                putExtra("flag", true)
+            }
+        )
         startActivityForResult(
             intent.getParcelableExtra("data")!!,
             uniqueId and 0xffff

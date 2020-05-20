@@ -8,7 +8,9 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
 import android.provider.Settings
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.shouzhong.base.util.getApp
@@ -26,7 +28,7 @@ class PermissionUtils private constructor(){
          *
          */
         fun getPermissions(): List<String> {
-            val list = ArrayList<String>()
+            val list = arrayListOf<String>()
             try {
                 val permissions = getApp().packageManager.getPackageInfo(getApp().packageName, PackageManager.GET_PERMISSIONS)?.requestedPermissions ?: return list
                 for (permission in permissions) {
@@ -68,10 +70,11 @@ class PermissionUtils private constructor(){
         fun requestPermission(
             vararg permissions: String,
             ctx: Context? = null,
-            grantedCallback: ((permissionsGranted: List<String>) -> Unit)? = null,
-            deniedCallback: ((permissionsDenied: List<String>, permissionsDeniedForever: List<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null,
+            grantedCallback: ((permissionsGranted: ArrayList<String>) -> Unit)? = null,
+            deniedCallback: ((permissionsDenied: ArrayList<String>, permissionsDeniedForever: ArrayList<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null,
             simpleGrantedCallback: (() -> Unit)? = null,
-            simpleDeniedCallback: (() -> Unit)? = null
+            simpleDeniedCallback: (() -> Unit)? = null,
+            error: ((errorMessage: String) -> Unit)? = null
         ) {
             PermissionUtils().apply {
                 this.type = 0
@@ -80,6 +83,7 @@ class PermissionUtils private constructor(){
                 this.deniedCallback = deniedCallback
                 this.simpleGrantedCallback = simpleGrantedCallback
                 this.simpleDeniedCallback = simpleDeniedCallback
+                this.error = error
             }.request(ctx)
         }
 
@@ -96,7 +100,8 @@ class PermissionUtils private constructor(){
         fun requestWriteSettings(
             ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
-            deniedCallback: (() -> Unit)? = null
+            deniedCallback: (() -> Unit)? = null,
+            error: ((errorMessage: String) -> Unit)? = null
         ) {
             if (isGrantedWriteSettings()) {
                 grantedCallback?.invoke()
@@ -106,6 +111,7 @@ class PermissionUtils private constructor(){
                 this.type = 1
                 this.simpleGrantedCallback = grantedCallback
                 this.simpleDeniedCallback = deniedCallback
+                this.error = error
             }.request(ctx)
         }
 
@@ -122,7 +128,8 @@ class PermissionUtils private constructor(){
         fun requestOverlay(
             ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
-            deniedCallback: (() -> Unit)? = null
+            deniedCallback: (() -> Unit)? = null,
+            error: ((errorMessage: String) -> Unit)? = null
         ) {
             if (isGrantedOverlay()) {
                 grantedCallback?.invoke()
@@ -132,6 +139,7 @@ class PermissionUtils private constructor(){
                 this.type = 2
                 this.simpleGrantedCallback = grantedCallback
                 this.simpleDeniedCallback = deniedCallback
+                this.error = error
             }.request(ctx)
         }
 
@@ -148,7 +156,8 @@ class PermissionUtils private constructor(){
         fun requestNotification(
             ctx: Context? = null,
             grantedCallback: (() -> Unit)? = null,
-            deniedCallback: (() -> Unit)? = null
+            deniedCallback: (() -> Unit)? = null,
+            error: ((errorMessage: String) -> Unit)? = null
         ) {
             if (isGrantedNotification()) {
                 grantedCallback?.invoke()
@@ -158,6 +167,7 @@ class PermissionUtils private constructor(){
                 this.type = 3
                 this.simpleGrantedCallback = grantedCallback
                 this.simpleDeniedCallback = deniedCallback
+                this.error = error
             }.request(ctx)
         }
 
@@ -172,38 +182,69 @@ class PermissionUtils private constructor(){
         }
     }
 
-    private val uniqueId = hashCode(this)
-    private var type: Int = 0
-    private var permissions: Array<out String>? = null
-    private var grantedCallback: ((permissionsGranted: List<String>) -> Unit)? = null
-    private var deniedCallback: ((permissionsDenied: List<String>, permissionsDeniedForever: List<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null
-    private var simpleGrantedCallback: (() -> Unit)? = null
-    private var simpleDeniedCallback: (() -> Unit)? = null
+    internal val uniqueId = hashCode(this)
+    internal var flag = false
+    internal var type: Int = 0
+    internal var permissions: Array<out String>? = null
+    internal var grantedCallback: ((permissionsGranted: ArrayList<String>) -> Unit)? = null
+    internal var deniedCallback: ((permissionsDenied: ArrayList<String>, permissionsDeniedForever: ArrayList<String>, permissionsUndefined: ArrayList<String>) -> Unit)? = null
+    internal var simpleGrantedCallback: (() -> Unit)? = null
+    internal var simpleDeniedCallback: (() -> Unit)? = null
+    private var error: ((errorMessage: String) -> Unit)? = null
 
-    private fun request(ctx: Context?) {
-        require(type != 0 || permissions?.isNotEmpty() == true) { "permission is null" }
-        getApp().registerReceiver(
-            object : BroadcastReceiver() {
-                override fun onReceive(context: Context?, intent: Intent?) {
-                    getApp().unregisterReceiver(this)
-                    val data = intent?.getParcelableExtra<PermissionBean>("data") ?: return
-                    if (type == 0) {
-                        grantedCallback?.invoke(data.permissionsGranted)
-                        deniedCallback?.invoke(data.permissionsDenied, data.permissionsDeniedForever, data.permissionsUndefined)
-                    }
-                    if (data.isGranted) simpleGrantedCallback?.invoke()
-                    else simpleDeniedCallback?.invoke()
+    private fun request(context: Context?) {
+        if (type == 0 && permissions?.isNotEmpty() != true) {
+            error?.invoke("permissions is empty")
+            return
+        }
+        val ctx = context ?: getApp()
+        if (ctx is AppCompatActivity) {
+            getFragment(ctx).put(this)
+            return
+        }
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.getBooleanExtra("flag", false) == true) {
+                    flag = true
+                    return
                 }
-            },
+                getApp().unregisterReceiver(this)
+                val data = intent?.getParcelableExtra<PermissionBean>("data") ?: return
+                if (type == 0) {
+                    grantedCallback?.invoke(data.permissionsGranted)
+                    deniedCallback?.invoke(data.permissionsDenied, data.permissionsDeniedForever, data.permissionsUndefined)
+                }
+                if (data.isGranted) simpleGrantedCallback?.invoke()
+                else simpleDeniedCallback?.invoke()
+            }
+        }
+        getApp().registerReceiver(
+            receiver,
             IntentFilter("${getApp().packageName}.shouzhong.receiver.action.REQUEST_PERMISSION_$uniqueId")
         )
-        (ctx ?: getApp()).startActivity(
-            Intent(ctx ?: getApp(), PermissionActivity::class.java).apply {
-                if (ctx == null || ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ctx.startActivity(
+            Intent(ctx, PermissionActivity::class.java).apply {
+                if (ctx !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("type", this@PermissionUtils.type)
                 putExtra("unique_id", this@PermissionUtils.uniqueId)
                 putExtra("data", this@PermissionUtils.permissions)
             }
         )
+        Handler().postDelayed({
+            if (flag) return@postDelayed
+            getApp().unregisterReceiver(receiver)
+            error?.invoke("launcher failure")
+        }, 500)
+    }
+
+    private fun getFragment(act: AppCompatActivity): PermissionFragment {
+        val manager = act.supportFragmentManager
+        var frgm: PermissionFragment? = manager.findFragmentByTag(PermissionFragment.TAG) as PermissionFragment?
+        if (frgm == null) {
+            frgm = PermissionFragment()
+            manager.beginTransaction().add(frgm, PermissionFragment.TAG).commitAllowingStateLoss()
+            manager.executePendingTransactions()
+        }
+        return frgm
     }
 }

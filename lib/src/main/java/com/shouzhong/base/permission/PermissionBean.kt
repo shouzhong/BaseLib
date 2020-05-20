@@ -6,8 +6,9 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class PermissionBean(
     var isGranted: Boolean = false,
-    val permissionsGranted: ArrayList<String> = ArrayList(),
-    val permissionsDenied: ArrayList<String> = ArrayList(),
-    val permissionsDeniedForever: ArrayList<String> = ArrayList(),
-    val permissionsUndefined: ArrayList<String> = ArrayList()
+    val permissionsRequest: ArrayList<String> = arrayListOf(),
+    val permissionsGranted: ArrayList<String> = arrayListOf(),
+    val permissionsDenied: ArrayList<String> = arrayListOf(),
+    val permissionsDeniedForever: ArrayList<String> = arrayListOf(),
+    val permissionsUndefined: ArrayList<String> = arrayListOf()
 ) : Parcelable

@@ -22,6 +22,29 @@ android {
     dataBinding {
         enabled = true
     }
+
+    //签名配置
+    signingConfigs {
+        config {
+            keyAlias "test"
+            keyPassword "123456"
+            storeFile file("/test.jks")
+            storePassword "123456"
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.config
+        }
+        release {
+            signingConfig signingConfigs.config
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
 }
 
 dependencies {
