@@ -8,8 +8,6 @@ import android.content.IntentFilter
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.shouzhong.base.util.getApp
-import com.shouzhong.base.util.hashCode
-import com.shouzhong.bridge.ActivityStack
 
 /**
  * 实现在任何地方调用startActivityForResult
@@ -31,7 +29,7 @@ class RequestUtils private constructor() {
         }
     }
 
-    private val uniqueId = hashCode(this)
+    private val uniqueId = System.identityHashCode(this)
     private var flag = false
     private lateinit var intent: Intent
     private lateinit var callback: (resultCode: Int, data: Intent?) -> Unit

@@ -6,7 +6,7 @@
 ## 使用
 ### 依赖
 ```
-implementation 'com.shouzhong:BaseLib:1.0.3'
+implementation 'com.shouzhong:BaseLib:1.0.4'
 ```
 ### 代码
 首先，你需要在Application中初始化

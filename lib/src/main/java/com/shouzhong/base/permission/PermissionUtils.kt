@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.shouzhong.base.util.getApp
-import com.shouzhong.base.util.hashCode
 import com.shouzhong.base.util.startActivity
 
 /**
@@ -182,7 +181,7 @@ class PermissionUtils private constructor(){
         }
     }
 
-    internal val uniqueId = hashCode(this)
+    internal val uniqueId = System.identityHashCode(this)
     internal var flag = false
     internal var type: Int = 0
     internal var permissions: Array<out String>? = null

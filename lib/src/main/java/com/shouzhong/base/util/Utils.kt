@@ -381,20 +381,5 @@ fun File.openByOtherApp(ctx: Context = getApp(), callback: ((Int, Intent?) -> Un
  */
 fun String.toMimeType(): String? {
     if (TextUtils.isEmpty(this)) return null
-    val ext = MimeTypeMap.getFileExtensionFromUrl(this)
-    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
+    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(this))
 }
-
-/**
- * 获取hashCode
- *
- */
-fun hashCode(obj: Any): Int {
-    try {
-        val method = obj.javaClass.getDeclaredMethod("identityHashCode", Any::class.java)
-        method.isAccessible = true
-        return method.invoke(null, obj) as Int
-    } catch (e: Throwable) {}
-    return obj.hashCode()
-}
-
