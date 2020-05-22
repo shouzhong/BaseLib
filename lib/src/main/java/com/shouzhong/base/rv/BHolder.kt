@@ -2,14 +2,13 @@ package com.shouzhong.base.rv
 
 import android.content.ContextWrapper
 import android.view.View
-import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.shouzhong.base.act.BActivity
 
-open class BHolder<T>(itemView: View, dataList: DataList) : RecyclerView.ViewHolder(itemView) {
-    val data = ObservableField<T>()
-    val dataList = dataList
+open class BHolder<T>(itemView: View, val dataList: DataList) : RecyclerView.ViewHolder(itemView) {
+    val data = MutableLiveData<T>()
 
     var viewDataBinding: ViewDataBinding? = null
         internal set

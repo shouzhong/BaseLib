@@ -66,8 +66,7 @@ class PermissionActivity : AppCompatActivity() {
                 action = when (this@PermissionActivity.type) {
                     1 -> Settings.ACTION_MANAGE_WRITE_SETTINGS
                     2 -> Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-                    3 -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    else -> null
+                    else -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 }
                 data = Uri.parse("package:$packageName")
             },

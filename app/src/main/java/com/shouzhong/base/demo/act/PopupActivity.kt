@@ -2,7 +2,7 @@ package com.shouzhong.base.demo.act
 
 import android.view.Gravity
 import android.view.View
-import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.MutableLiveData
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.annotation.PopupCancelable
@@ -17,11 +17,11 @@ class PopupActivity : BActivity<PopupViewModel>(R.layout.act_popup)
 
 class PopupViewModel : BViewModel() {
     @PopupSwitch(TestPopup::class)
-    val testPopupSwitch = ObservableBoolean(false)
+    val testPopupSwitch = MutableLiveData<Boolean>()
     @PopupData(TestPopup::class)
     val testPopupData = TestPopupBean()
     @PopupCancelable(TestPopup::class)
-    val testPopupCancelable = ObservableBoolean(false)
+    val testPopupCancelable = MutableLiveData<Boolean>()
 
     fun onClickLeft(view: View) {
         show(view, PopupFragment.SHOW_STYLE_LEFT)
@@ -49,10 +49,10 @@ class PopupViewModel : BViewModel() {
 
     private fun show(view: View, style: String) {
         testPopupData.run {
-            showStyle.set(style)
-            shadowAlpha.set(if ((0..1).random() == 0) 0.5f else 1f)
-            relatedView.set(view)
-            gravity.set(when(style) {
+            showStyle = style
+            shadowAlpha = if ((0..1).random() == 0) 0.5f else 1f
+            relatedView = view
+            gravity = when(style) {
                 in arrayOf(PopupFragment.SHOW_STYLE_LEFT, PopupFragment.SHOW_STYLE_RIGHT) -> when((0..4).random()){
                     0 -> Gravity.START
                     1 -> Gravity.TOP
@@ -69,13 +69,13 @@ class PopupViewModel : BViewModel() {
                 }
                 PopupFragment.SHOW_STYLE_LOCATION -> Gravity.CENTER
                 else -> Gravity.NO_GRAVITY
-            })
-            title.set("Popup")
-            listener.set {
-                testPopupSwitch.set(false)
+            }
+            title = "Popup"
+            listener = {
+                testPopupSwitch.value = false
             }
         }
-        testPopupCancelable.set(true)
-        testPopupSwitch.set(true)
+        testPopupCancelable.value = true
+        testPopupSwitch.value = true
     }
 }

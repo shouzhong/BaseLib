@@ -6,12 +6,12 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ObservableBoolean
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import com.shouzhong.base.util.*
+import com.shouzhong.base.util.getGenericClass
 import com.shouzhong.bridge.FragmentStack
 
 abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() {
@@ -19,32 +19,32 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         private set
     private var vm: T? = null
 
-    var showSwitch: ObservableBoolean? = null
+    var showSwitch: MutableLiveData<Boolean>? = null
     var data: Any? = null
 
     override fun show(manager: FragmentManager, tag: String?) {
         super.show(manager, tag)
-        showSwitch?.set(true)
+        if (showSwitch?.value != true) showSwitch?.value = true
     }
 
     override fun dismiss() {
         super.dismiss()
-        showSwitch?.set(false)
+        if (showSwitch?.value != false) showSwitch?.value = false
     }
 
     override fun dismissAllowingStateLoss() {
         super.dismissAllowingStateLoss()
-        showSwitch?.set(false)
+        if (showSwitch?.value != false) showSwitch?.value = false
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        showSwitch?.set(false)
+        if (showSwitch?.value != false) showSwitch?.value = false
     }
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        showSwitch?.set(false)
+        if (showSwitch?.value != false) showSwitch?.value = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +63,7 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
             isAccessible = true
             invoke(viewDataBinding, vm)
         }
+        viewDataBinding?.lifecycleOwner = this
         return viewDataBinding?.root
     }
 

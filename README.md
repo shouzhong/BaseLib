@@ -116,13 +116,13 @@ class YourDialog : BDialog<YourViewModel>(R.layout.布局id)
 // 在Activity、Fragment和RecyclerView中使用，在其ViewModel或holder中
 // 开关
 @DialogSwitch(YourDialog::class)
-val yourDialogSwitch = ObservableBoolean(false)
+val yourDialogSwitch = MutableLiveData<Boolean>()
 // 数据
 @DialogData(YourDialog::class)
 val yourDialogData = YourDialogBean()
 // 是否点击屏幕外或者返回键可关闭，非必须，默认true
 @DialogCancelable(YourDialog::class)
-val yourDialogCancelable = ObservableBoolean(false)
+val yourDialogCancelable = MutableLiveData<Boolean>()
 // 如果你想在其他地方使用，请在其中调用initDialog(appCompatActivity)
 ```
 在PopupWindow中使用
@@ -150,12 +150,12 @@ class YourPopup : BPopup<YourViewModel>(R.layout.布局id)
 </layout>
 // 在Activity、Fragment和RecyclerView中使用，在其ViewModel或holder中
 @PopupSwitch(YourPopup::class)
-val yourPopupSwitch = ObservableBoolean(false)
+val yourPopupSwitch = MutableLiveData<Boolean>()
 @PopupData(YourPopup::class)
 val yourPopupData = YourPopupBean()
 // 是否点击屏幕外或者返回键可关闭，非必须，默认true
 @PopupCancelable(YourPopup::class)
-val yourPopupCancelable = ObservableBoolean(false)
+val yourPopupCancelable = MutableLiveData<Boolean>()
 // 如果你想在其他地方使用，请在其中调用initPopup(appCompatActivity)
 ```
 其他

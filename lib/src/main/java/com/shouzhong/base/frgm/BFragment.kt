@@ -38,6 +38,7 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
             isAccessible = true
             invoke(viewDataBinding, vm)
         }
+        viewDataBinding?.lifecycleOwner = this
         return viewDataBinding?.root
     }
 
@@ -136,8 +137,8 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         vm = ViewModelProvider(this).get(getGenericClass<T>(0)!!)
         vm?.uniqueId = FragmentStack.getUniqueId(this)
         if (activity is AppCompatActivity) {
-            vm?.initDialog(activity as AppCompatActivity)
-            vm?.initPopup(activity as AppCompatActivity)
+            vm?.initDialog(activity as AppCompatActivity, this)
+            vm?.initPopup(activity as AppCompatActivity, this)
         }
         vm?.init()
         return vm!!

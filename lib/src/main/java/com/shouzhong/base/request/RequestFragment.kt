@@ -19,7 +19,8 @@ class RequestFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        cache[requestCode]?.invoke(resultCode, data)
+        if (this.cache.indexOfKey(requestCode) < 0) return
+        cache[requestCode].invoke(resultCode, data)
         cache.remove(requestCode)
     }
 }

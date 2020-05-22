@@ -50,8 +50,7 @@ class PermissionFragment : Fragment() {
                 action = when (p.type) {
                     1 -> Settings.ACTION_MANAGE_WRITE_SETTINGS
                     2 -> Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-                    3 -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    else -> null
+                    else -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 }
                 data = Uri.parse("package:${getApp().packageName}")
             },
@@ -61,17 +60,16 @@ class PermissionFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val code = requestCode and 0xffff
-        if (this.cache.indexOfKey(code) < 0) return
-        val result = when(this.cache[code].type) {
+        if (this.cache.indexOfKey(requestCode) < 0) return
+        val result = when(this.cache[requestCode].type) {
             1 -> PermissionUtils.isGrantedWriteSettings()
             2 -> PermissionUtils.isGrantedOverlay()
             3 -> PermissionUtils.isGrantedNotification()
             else -> false
         }
-        if (result) this.cache[code].simpleGrantedCallback?.invoke()
-        else this.cache[code].simpleDeniedCallback?.invoke()
-        this.cache.remove(code)
+        if (result) this.cache[requestCode].simpleGrantedCallback?.invoke()
+        else this.cache[requestCode].simpleDeniedCallback?.invoke()
+        this.cache.remove(requestCode)
     }
 
     override fun onRequestPermissionsResult(
@@ -80,20 +78,19 @@ class PermissionFragment : Fragment() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        val code = requestCode and 0xffff
-        if (this.cache.indexOfKey(code) < 0) return
+        if (this.cache.indexOfKey(requestCode) < 0) return
         for (i in permissions.indices) {
             if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                data[code].permissionsGranted.add(permissions[i])
+                data[requestCode].permissionsGranted.add(permissions[i])
                 continue
             }
             if (shouldShowRequestPermissionRationale(permissions[i])) {
-                data[code].permissionsDenied.add(permissions[i])
+                data[requestCode].permissionsDenied.add(permissions[i])
                 continue
             }
-            data[code].permissionsDeniedForever.add(permissions[i])
+            data[requestCode].permissionsDeniedForever.add(permissions[i])
         }
-        a(code)
+        a(requestCode)
     }
 
     private fun a(code: Int) {

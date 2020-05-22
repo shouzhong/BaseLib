@@ -37,10 +37,10 @@ dependencies {
     api 'androidx.core:core-ktx:1.2.0'
     api 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     api 'com.drakeet.multitype:multitype:4.2.0'
-    api 'com.shouzhong:Bridge:1.0.4'
+    api 'com.shouzhong:Bridge:1.0.5'
     api 'org.greenrobot:eventbus:3.2.0'
     api 'com.google.code.gson:gson:2.8.6'
-    compileOnly 'com.blankj:utilcodex:1.28.4'
+    compileOnly 'com.blankj:utilcodex:1.28.5'
 }
 
 //发布 Jcenter

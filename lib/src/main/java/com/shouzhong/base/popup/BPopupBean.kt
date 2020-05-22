@@ -1,18 +1,14 @@
 package com.shouzhong.base.popup
 
 import android.view.View
-import androidx.databinding.ObservableField
-import androidx.databinding.ObservableFloat
-import androidx.databinding.ObservableInt
 
 open class BPopupBean {
-    val tag: ObservableField<String> = ObservableField("${System.identityHashCode(this)}")
-    val shadowAlpha: ObservableFloat = ObservableFloat(1f)
-    val showStyle: ObservableField<String> = ObservableField(PopupFragment.SHOW_STYLE_DROP_DOWN)
-    val relatedView: ObservableField<View> = ObservableField()
-    val gravity: ObservableInt = ObservableInt(0)
-    val x: ObservableInt = ObservableInt(0)
-    val y: ObservableInt = ObservableInt(0)
+    var shadowAlpha: Float = 1f
+    var showStyle: String = PopupFragment.SHOW_STYLE_DROP_DOWN
+    var relatedView: View? = null
+    var gravity: Int = 0
+    var x: Int = 0
+    var y: Int = 0
 }
 
 

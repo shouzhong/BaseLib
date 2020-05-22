@@ -1,5 +1,7 @@
 package com.shouzhong.base.permission
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.provider.Settings
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -143,7 +146,7 @@ class PermissionUtils private constructor(){
         }
 
         /**
-         * 是否有通知权限
+         * 判断通知是否可用
          *
          */
         fun isGrantedNotification(): Boolean = NotificationManagerCompat.from(getApp()).areNotificationsEnabled()
@@ -168,6 +171,26 @@ class PermissionUtils private constructor(){
                 this.simpleDeniedCallback = deniedCallback
                 this.error = error
             }.request(ctx)
+        }
+
+        /**
+         * 设置通知栏是否可见
+         *
+         */
+        @RequiresPermission(Manifest.permission.EXPAND_STATUS_BAR)
+        fun setNotificationBarVisibility(isVisible: Boolean) {
+            try {
+                val methodName = when {
+                    isVisible && (Build.VERSION.SDK_INT <= 16) -> "expand"
+                    isVisible && (Build.VERSION.SDK_INT > 16) -> "expandNotificationsPanel"
+                    !isVisible && (Build.VERSION.SDK_INT <= 16) -> "collapse"
+                    else -> "collapsePanels"
+                }
+                @SuppressLint("WrongConstant")
+                val service = getApp().getSystemService("statusbar")
+                val clsStatusBarManager = Class.forName("android.app.StatusBarManager")
+                clsStatusBarManager.getMethod(methodName).invoke(service)
+            } catch (e: Throwable) {}
         }
 
         /**

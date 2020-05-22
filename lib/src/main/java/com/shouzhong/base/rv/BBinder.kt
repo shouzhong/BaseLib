@@ -6,13 +6,18 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.LifecycleOwner
 import com.drakeet.multitype.ItemViewBinder
 import com.shouzhong.base.util.*
 import java.lang.Exception
 
-open class BBinder<T, VH : BHolder<T>>(val layoutId: Int) : ItemViewBinder<T, VH>() {
+open class BBinder<T, VH : BHolder<T>>(
+    val lifecycleOwner: LifecycleOwner,
+    val layoutId: Int
+) : ItemViewBinder<T, VH>() {
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): VH {
         val binding: ViewDataBinding = DataBindingUtil.inflate(inflater, layoutId, parent, false)
+        binding.lifecycleOwner = lifecycleOwner
         return getGenericClass<VH>(1)?.let { cls ->
             cls.getDeclaredConstructor(View::class.java, DataList::class.java)
                 .newInstance(binding.root, adapter.items as DataList).also { holder ->
@@ -22,16 +27,15 @@ open class BBinder<T, VH : BHolder<T>>(val layoutId: Int) : ItemViewBinder<T, VH
                         invoke(binding, holder)
                     }
                     if (inflater.context is AppCompatActivity) {
-                        holder.initDialog(inflater.context as AppCompatActivity)
-                        holder.initPopup(inflater.context as AppCompatActivity)
+                        holder.initDialog(inflater.context as AppCompatActivity, lifecycleOwner)
+                        holder.initPopup(inflater.context as AppCompatActivity, lifecycleOwner)
                     }
                 }
         } ?: throw Exception("VH is null")
     }
 
     override fun onBindViewHolder(holder: VH, item: T) {
-        holder.data.set(null)
-        holder.data.set(item)
+        holder.data.value = item
         holder.onBind()
     }
 }

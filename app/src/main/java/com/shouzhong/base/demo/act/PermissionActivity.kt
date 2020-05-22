@@ -2,7 +2,7 @@ package com.shouzhong.base.demo.act
 
 import android.Manifest
 import android.view.View
-import androidx.databinding.ObservableField
+import androidx.lifecycle.MutableLiveData
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.demo.R
@@ -12,10 +12,10 @@ import com.shouzhong.base.util.permissionRequest
 class PermissionActivity : BActivity<PermissionViewModel>(R.layout.act_permission)
 
 class PermissionViewModel : BViewModel() {
-    val text = ObservableField<CharSequence>()
+    val text = MutableLiveData<CharSequence?>()
 
     fun onClickPermission(v: View) {
-        text.set("")
+        text.value = ""
         arrayListOf(
             Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -24,19 +24,19 @@ class PermissionViewModel : BViewModel() {
         ).permissionRequest(
             ctx = getActivity(),
             grantedCallback = { permissionsGranted ->
-                text.set(StringBuffer().apply {
-                    append(text.get())
+                text.value = StringBuffer().apply {
+                    append(text.value?.toString())
                     append("grantedCallback:\n[")
                     for (i in permissionsGranted.indices) {
                         append(permissionsGranted[i])
                         if (i < permissionsGranted.size - 1) append(", ")
                     }
                     append("]\n\n")
-                })
+                }
             },
             deniedCallback = { permissionsDenied, permissionsDeniedForever, permissionsUndefined ->
-                text.set(StringBuffer().apply {
-                    append(text.get())
+                text.value = StringBuffer().apply {
+                    append(text.value?.toString())
                     append("deniedCallback:\npermissionsDenied:\n[")
                     for (i in permissionsDenied.indices) {
                         append(permissionsDenied[i])
@@ -53,19 +53,19 @@ class PermissionViewModel : BViewModel() {
                         if (i < permissionsUndefined.size - 1) append(", ")
                     }
                     append("]\n\n")
-                })
+                }
             },
             simpleGrantedCallback = {
-                text.set(StringBuffer().apply {
-                    append(text.get())
+                text.value = StringBuffer().apply {
+                    append(text.value?.toString())
                     append("simpleGrantedCallback\n\n")
-                })
+                }
             },
             simpleDeniedCallback = {
-                text.set(StringBuffer().apply {
-                    append(text.get())
+                text.value = StringBuffer().apply {
+                    append(text.value?.toString())
                     append("simpleDeniedCallback\n\n")
-                })
+                }
             }
         )
 
@@ -224,40 +224,40 @@ class PermissionViewModel : BViewModel() {
     }
 
     fun onClickWriteSettings(v: View) {
-        text.set("")
+        text.value = ""
         PermissionUtils.requestWriteSettings(
             ctx = getActivity(),
             grantedCallback = {
-                text.set("success")
+                text.value = "success"
             },
             deniedCallback = {
-                text.set("failure")
+                text.value = "failure"
             }
         )
     }
 
     fun onClickOverlay(v: View) {
-        text.set("")
+        text.value = ""
         PermissionUtils.requestOverlay(
             ctx = getActivity(),
             grantedCallback = {
-                text.set("success")
+                text.value = "success"
             },
             deniedCallback = {
-                text.set("failure")
+                text.value = "failure"
             }
         )
     }
 
     fun onClickNotification(v: View) {
-        text.set("")
+        text.value = ""
         PermissionUtils.requestNotification(
             ctx = getActivity(),
             grantedCallback = {
-                text.set("success")
+                text.value = "success"
             },
             deniedCallback = {
-                text.set("failure")
+                text.value = "failure"
             }
         )
     }

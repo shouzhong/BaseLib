@@ -1,13 +1,15 @@
 package com.shouzhong.base.rv
 
-import androidx.databinding.ObservableInt
+import androidx.lifecycle.MutableLiveData
 import com.drakeet.multitype.MultiTypeAdapter
 
 class DataList : ArrayList<Any>() {
     // rv适配器
     val adapter = MultiTypeAdapter(this)
     // 数据长度
-    val length = ObservableInt(size)
+    val length = MutableLiveData<Int>().apply {
+        value = size
+    }
     // 是否在增删改的时候刷新
     var isRefresh: Boolean = true
 
@@ -20,7 +22,7 @@ class DataList : ArrayList<Any>() {
         if (index < 0 || index > size) return
         super.add(index, element)
         if (isRefresh) adapter.notifyItemInserted(index)
-        length.set(size)
+        length.value = size
     }
 
     override fun addAll(elements: Collection<Any>): Boolean {
@@ -31,7 +33,7 @@ class DataList : ArrayList<Any>() {
         if (elements.isEmpty() || index < 0 || index > size) return false
         val boo = super.addAll(index, elements)
         if (boo && isRefresh) adapter.notifyItemRangeInserted(index, elements.size)
-        length.set(size)
+        length.value = size
         return boo
     }
 
@@ -53,7 +55,7 @@ class DataList : ArrayList<Any>() {
         if (index < 0 || index >= size) return false
         val old = super.removeAt(index)
         if (isRefresh) adapter.notifyItemRemoved(index)
-        length.set(size)
+        length.value = size
         return old
     }
 
@@ -69,7 +71,7 @@ class DataList : ArrayList<Any>() {
         if (isEmpty()) return
         super.clear()
         adapter.notifyDataSetChanged()
-        length.set(size)
+        length.value = size
     }
 
     fun notifyItemChanged(element: Any) {

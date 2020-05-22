@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ObservableBoolean
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.shouzhong.base.util.getGenericClass
 import com.shouzhong.bridge.FragmentStack
@@ -21,7 +21,7 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
         private set
     private var vm: T? = null
 
-    var showSwitch: ObservableBoolean? = null
+    var showSwitch: MutableLiveData<Boolean>? = null
     var data: BPopupBean? = null
 
     override fun show(
@@ -34,26 +34,26 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
         yoff: Int
     ) {
         super.show(manager, tag, showStyle, view, gravity, xoff, yoff)
-        shadowAlpha = data?.shadowAlpha?.get() ?: 1f
-        showSwitch?.set(true)
+        shadowAlpha = data?.shadowAlpha ?: 1f
+        if (showSwitch?.value != true) showSwitch?.value = true
     }
 
     override fun dismiss() {
         super.dismiss()
-        showSwitch?.set(false)
-        data?.relatedView?.set(null)
+        if (showSwitch?.value != false) showSwitch?.value = false
+        data?.relatedView = null
     }
 
     override fun dismissAllowingStateLoss() {
         super.dismissAllowingStateLoss()
-        showSwitch?.set(false)
-        data?.relatedView?.set(null)
+        if (showSwitch?.value != false) showSwitch?.value = false
+        data?.relatedView = null
     }
 
     override fun onDismiss() {
         super.onDismiss()
-        showSwitch?.set(false)
-        data?.relatedView?.set(null)
+        if (showSwitch?.value != false) showSwitch?.value = false
+        data?.relatedView = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +72,7 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
             isAccessible = true
             invoke(viewDataBinding, vm)
         }
+        viewDataBinding?.lifecycleOwner = this
         return viewDataBinding?.root
     }
 

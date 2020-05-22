@@ -26,6 +26,7 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
             isAccessible = true
             invoke(viewDataBinding, getVm())
         }
+        viewDataBinding?.lifecycleOwner = this
         lifecycle.addObserver(vm!!)
         vm?.onCreate(savedInstanceState)
     }
@@ -100,8 +101,8 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
         if (vm != null) return vm!!
         vm = ViewModelProvider(this).get(getGenericClass<T>(0)!!)
         vm?.uniqueId = ActivityStack.getUniqueId(this)
-        vm?.initDialog(this)
-        vm?.initPopup(this)
+        vm?.initDialog(this, this)
+        vm?.initPopup(this, this)
         vm?.init()
         return vm!!
     }

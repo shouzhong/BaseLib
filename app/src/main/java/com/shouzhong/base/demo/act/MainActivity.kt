@@ -1,21 +1,26 @@
 package com.shouzhong.base.demo.act
 
 import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import android.view.View
-import androidx.databinding.ObservableField
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.demo.R
-import com.shouzhong.base.request.RequestUtils
-import com.shouzhong.base.util.getApp
 import com.shouzhong.base.util.startActivity
 
 class MainActivity : BActivity<MainViewModel>(R.layout.act_main)
 
 class MainViewModel : BViewModel() {
-    val text = ObservableField<String>()
+    val text = MutableLiveData<CharSequence?>()
+    val etText = MutableLiveData<CharSequence?>()
+
+    override fun init() {
+        etText.observe(getActivity(), Observer {
+            LogUtils.e("value->${it}")
+        })
+    }
 
     fun onClickFragment(view: View) {
         Intent(getActivity(), FragmentActivity::class.java).startActivity(getActivity())
@@ -44,7 +49,7 @@ class MainViewModel : BViewModel() {
         Intent(getActivity(), RequestActivity::class.java).apply {
             putExtra("data", "这是来自MainActivity的数据")
         }.startActivity { resultCode, data ->
-            text.set("${resultCode}->${data?.getStringExtra("data")}")
+            text.value = "${resultCode}->${data?.getStringExtra("data")}"
         }
     }
 }
