@@ -9,9 +9,4 @@ import com.shouzhong.base.rv.DataList
 
 class TestBinder1(lifecycleOwner: LifecycleOwner) : BBinder<TestBean, TestHolder1>(lifecycleOwner, R.layout.rv_test_1)
 
-class TestHolder1(itemView: View, dataList: DataList) : BHolder<TestBean>(itemView, dataList) {
-    fun onClickPlus(v: View) {
-        data.value!!.index++
-        dataList.notifyItemChangedAt(adapterPosition)
-    }
-}
+class TestHolder1(itemView: View) : BHolder<TestBean>(itemView)

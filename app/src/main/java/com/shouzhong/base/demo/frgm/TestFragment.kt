@@ -14,7 +14,7 @@ class TestViewModel : BViewModel() {
 
     override fun init() {
         dataList.adapter.run {
-            register(TestBean::class, TestBinder1(getFragment()))
+            register(TestBean::class, TestBinder1(getLifecycleOwner()))
         }
     }
 

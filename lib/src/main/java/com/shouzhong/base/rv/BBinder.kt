@@ -19,9 +19,12 @@ open class BBinder<T, VH : BHolder<T>>(
         val binding: ViewDataBinding = DataBindingUtil.inflate(inflater, layoutId, parent, false)
         binding.lifecycleOwner = lifecycleOwner
         return getGenericClass<VH>(1)?.let { cls ->
-            cls.getDeclaredConstructor(View::class.java, DataList::class.java)
-                .newInstance(binding.root, adapter.items as DataList).also { holder ->
+            cls.getDeclaredConstructor(View::class.java)
+                .newInstance(binding.root).also { holder ->
+                    holder.dataList = adapter.items as DataList
                     holder.viewDataBinding = binding
+                    holder.lifecycleOwner = lifecycleOwner
+                    holder.init()
                     binding.javaClass.getDeclaredMethod("setHolder", cls).run {
                         isAccessible = true
                         invoke(binding, holder)

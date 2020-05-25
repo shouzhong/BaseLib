@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.shouzhong.bridge.FragmentStack
 
@@ -36,6 +37,8 @@ abstract class BViewModel<T : BPopupBean> : ViewModel(), LifecycleObserver {
     internal fun setData(data: Any?) {
         this.data = if (data == null) null else data as T
     }
+
+    fun getLifecycleOwner(): LifecycleOwner = getPopupWindow()
 
     inline fun <reified T : BPopup<*>> getPopupWindow(): T = FragmentStack.getFragment(uniqueId) as T
 

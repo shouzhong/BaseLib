@@ -3,15 +3,21 @@ package com.shouzhong.base.rv
 import android.content.ContextWrapper
 import android.view.View
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.shouzhong.base.act.BActivity
 
-open class BHolder<T>(itemView: View, val dataList: DataList) : RecyclerView.ViewHolder(itemView) {
+open class BHolder<T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val data = MutableLiveData<T>()
-
+    var dataList: DataList? = null
+        internal set
     var viewDataBinding: ViewDataBinding? = null
         internal set
+    var lifecycleOwner: LifecycleOwner? = null
+        internal set
+
+    open fun init() = Unit
 
     open fun onBind() = Unit
 

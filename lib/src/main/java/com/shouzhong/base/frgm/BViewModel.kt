@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.bridge.FragmentStack
@@ -42,6 +43,8 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
     open fun onConfigurationChanged(newConfig: Configuration) = Unit
 
     open fun onSaveInstanceState(outState: Bundle) = Unit
+
+    fun getLifecycleOwner(): LifecycleOwner = getFragment()
 
     inline fun <reified T : BFragment<*>> getFragment(): T = FragmentStack.getFragment(uniqueId) as T
 

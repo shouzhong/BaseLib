@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.shouzhong.bridge.ActivityStack
 
@@ -41,6 +42,8 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
     open fun onSaveInstanceState(outState: Bundle) = Unit
 
     open fun onRestoreInstanceState(savedInstanceState: Bundle) = Unit
+
+    fun getLifecycleOwner(): LifecycleOwner = getActivity()
 
     inline fun <reified T : BActivity<*>> getActivity(): T = ActivityStack.getActivity(uniqueId) as T
 
