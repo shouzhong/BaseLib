@@ -168,6 +168,12 @@ Intent.startActivity
 String.permissionRequest
 Array<String>.permissionRequest
 ArrayList<String>.permissionRequest
+// 获取资源
+Int.resToXxx
+// 调用三方应用打开文件（包括常用的安装apk包）
+File.openByOtherApp
+// 获取MIME类型
+String.toMimeType
 // toast
 toastShort
 toastLong
