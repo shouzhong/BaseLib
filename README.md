@@ -163,7 +163,6 @@ val yourPopupCancelable = MutableLiveData<Boolean>()
 ```
 // startActivity或startActivityForResult
 Intent.startActivity
-}
 // permission
 String.permissionRequest
 Array<String>.permissionRequest
