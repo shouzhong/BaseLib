@@ -409,21 +409,21 @@ fun runOnUiThread(
     getMainHandler().postDelayed(r, l)
 }
 
+fun toastShort(resId: Int) = toastShort(resId.resToString())
+
+fun toastLong(resId: Int) = toastLong(resId.resToString())
+
 /**
  * 短时吐司
  *
  */
-fun toastShort(s: CharSequence?) {
-    toast(Toast.LENGTH_SHORT, s)
-}
+fun toastShort(s: CharSequence?) = toast(Toast.LENGTH_SHORT, s)
 
 /**
  * 长时吐司
  *
  */
-fun toastLong(s: CharSequence?) {
-    toast(Toast.LENGTH_LONG, s)
-}
+fun toastLong(s: CharSequence?) = toast(Toast.LENGTH_LONG, s)
 
 private fun toast(
     duration: Int,
