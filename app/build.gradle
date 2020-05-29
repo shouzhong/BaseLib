@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "29.0.3"
     
     defaultConfig {
         applicationId "com.shouzhong.base.demo"
@@ -19,8 +19,8 @@ android {
 //        experimental = true
 //    }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding = true
     }
 
     //签名配置
@@ -49,6 +49,6 @@ android {
 
 dependencies {
     implementation project(":lib")
-    implementation 'com.blankj:utilcodex:1.28.5'
+    implementation 'com.blankj:utilcodex:1.29.0'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:2.2"
 }
