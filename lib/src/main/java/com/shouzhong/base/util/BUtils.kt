@@ -180,62 +180,6 @@ fun <T> Any.getGenericClass(index: Int): Class<T>? {
     }
 }
 
-///**
-// * 获取顶层Activity，如果在onCreate中调用，将不是当前activity
-// * 如果反射无法使用 ，请尝试使用https://github.com/tiann/FreeReflection
-// *
-// */
-//fun getTopActivity(): Activity? {
-//    try {
-//        val activityThreadClass = Class.forName("android.app.ActivityThread")
-//        val currentActivityThreadMethod = activityThreadClass.getMethod("currentActivityThread").invoke(null)
-//        val mActivityListField = activityThreadClass.getDeclaredField("mActivities")
-//        mActivityListField.isAccessible = true
-//        val activities = mActivityListField.get(currentActivityThreadMethod) as Map<*, *>
-//        val last = activities.values.last()!!
-//        val activityField = last.javaClass.getDeclaredField("activity")
-//        activityField.isAccessible = true
-//        return activityField.get(last) as Activity
-////        for (activityRecord in activities.values) {
-////            val activityRecordClass = activityRecord!!.javaClass
-////            val pausedField = activityRecordClass.getDeclaredField("paused")
-////            pausedField.isAccessible = true
-////            if (!pausedField.getBoolean(activityRecord)) {
-////                val activityField = activityRecordClass.getDeclaredField("activity")
-////                activityField.isAccessible = true
-////                return activityField.get(activityRecord) as Activity
-////            }
-////        }
-//    } catch (e: Throwable) { }
-//    return null
-//}
-//
-///**
-// * 获取activity栈，如果在onCreate中调用，将没有当前activity
-// * 如果反射无法使用 ，请尝试使用：https://github.com/tiann/FreeReflection
-// *
-// */
-//fun getActivities(): List<Activity> {
-//    var list = ArrayList<Activity>()
-//    try {
-//        val mLoadedApkField = Application::class.java.getDeclaredField("mLoadedApk")
-//        mLoadedApkField.isAccessible = true
-//        val mLoadedApk = mLoadedApkField.get(getApp())
-//        val mActivityThreadField = mLoadedApk.javaClass.getDeclaredField("mActivityThread")
-//        mActivityThreadField.isAccessible = true
-//        val mActivityThread = mActivityThreadField.get(mLoadedApk)
-//        val mActivitiesField = mActivityThread.javaClass.getDeclaredField("mActivities")
-//        mActivitiesField.isAccessible = true
-//        val mActivities = mActivitiesField.get(mActivityThread) as Map<*, *>
-//        for (value in mActivities.values) {
-//            val activityField = value!!.javaClass.getDeclaredField("activity")
-//            activityField.isAccessible = true
-//            list.add(activityField.get(value) as Activity)
-//        }
-//    } catch (e: Throwable) { }
-//    return list
-//}
-
 /**
  * 将startActivity和startActivityForResult合并，在[callback]回调
  * 某些机型在后台需要权限才能打开activity，对于这种情况（只针对不传AppCompatActivity）请使用RequestUtils.startActivityForResult，无法打开时将在[error]中回调
