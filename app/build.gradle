@@ -46,5 +46,6 @@ android {
 dependencies {
     implementation project(":lib")
     implementation 'com.blankj:utilcodex:1.29.0'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:2.2"
 }

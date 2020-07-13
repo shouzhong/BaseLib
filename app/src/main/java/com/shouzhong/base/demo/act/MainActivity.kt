@@ -5,9 +5,11 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.view.View
 import androidx.lifecycle.MutableLiveData
+import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.demo.R
+import com.shouzhong.base.demo.reflect.TestReflect
 import com.shouzhong.base.util.getApp
 import com.shouzhong.base.util.startActivity
 import java.io.BufferedReader
@@ -19,6 +21,21 @@ class MainActivity : BActivity<MainViewModel>(R.layout.act_main)
 
 class MainViewModel : BViewModel() {
     val text = MutableLiveData<String?>()
+
+    init {
+        TestReflect.TYPE
+//        LogUtils.e(TestReflect.A.get())
+//        TestReflect.A.set("456")
+//        LogUtils.e(TestReflect.A.get())
+//        TestReflect.a.call()
+//        LogUtils.e(TestReflect.b.call(11, "aa"))
+//        val testBean = TestReflect.newInstance.newInstance("sss")
+//        LogUtils.e(TestReflect.i.get(testBean))
+//        TestReflect.i.set(testBean, 777)
+//        LogUtils.e(TestReflect.i.get(testBean))
+//        TestReflect.aa.call(testBean)
+//        LogUtils.e(TestReflect.bb.call(testBean, 22, "bb"))
+    }
 
     fun onClickFragment(view: View) {
         Intent(getActivity(), FragmentActivity::class.java).startActivity(getActivity())

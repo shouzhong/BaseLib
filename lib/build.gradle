@@ -40,6 +40,7 @@ dependencies {
     api 'com.shouzhong:Bridge:1.0.5'
     api 'org.greenrobot:eventbus:3.2.0'
     api 'com.google.code.gson:gson:2.8.6'
+    compileOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compileOnly 'com.blankj:utilcodex:1.29.0'
 }
 

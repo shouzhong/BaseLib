@@ -1,5 +1,6 @@
 package com.shouzhong.base.reflect
 
+import com.blankj.utilcode.util.LogUtils
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -26,9 +27,15 @@ class RefClass {
             put(RefStaticFloat::class.java, RefStaticFloat::class.java.getConstructor(Class::class.java, Field::class.java))
             put(RefStaticBoolean::class.java, RefStaticBoolean::class.java.getConstructor(Class::class.java, Field::class.java))
             put(RefStaticChar::class.java, RefStaticChar::class.java.getConstructor(Class::class.java, Field::class.java))
+
+            put(RefMethod::class.java, RefMethod::class.java.getConstructor(Class::class.java, Field::class.java))
+            put(RefStaticMethod::class.java, RefStaticMethod::class.java.getConstructor(Class::class.java, Field::class.java))
+
+            put(RefConstructor::class.java, RefConstructor::class.java.getConstructor(Class::class.java, Field::class.java))
         }
 
-        fun load(mappingClass: Class<*>, realClass: Class<*>): Class<*> {
+        fun load(mappingClass: Class<*>, realClass: Class<*>? = null, clsName: String? = null): Class<*> {
+            val cls = realClass ?: Class.forName(clsName!!)
             try {
                 val fields = mappingClass.declaredFields;
                 for (field in fields) {
@@ -36,12 +43,12 @@ class RefClass {
                         if (!Modifier.isStatic(field.modifiers)) continue
                         val constructor = REF_TYPES[field.type]
                         if (constructor != null) {
-                            field.set(null, constructor.newInstance(realClass, field))
+                            field.set(null, constructor.newInstance(cls, field))
                         }
-                    } catch (e: Throwable) {}
+                    } catch (e: Throwable) { }
                 }
             } catch (e: Throwable) {}
-            return realClass;
+            return cls;
         }
     }
 }
