@@ -10,8 +10,8 @@ class TestReflect {
 
         lateinit var a: RefCompanionMethod<Void>
 
-        @MethodReflectParams(value = ["int", "java.lang.String"])
-        lateinit var b: RefStaticMethod<String>
+        @MethodParams(value = [Int::class, String::class])
+        lateinit var b: RefCompanionMethod<String>
 
         lateinit var i: RefInt
 

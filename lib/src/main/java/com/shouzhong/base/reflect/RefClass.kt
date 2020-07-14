@@ -1,6 +1,5 @@
 package com.shouzhong.base.reflect
 
-import com.blankj.utilcode.util.LogUtils
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -30,6 +29,7 @@ class RefClass {
 
             put(RefMethod::class.java, RefMethod::class.java.getConstructor(Class::class.java, Field::class.java))
             put(RefStaticMethod::class.java, RefStaticMethod::class.java.getConstructor(Class::class.java, Field::class.java))
+            put(RefCompanionMethod::class.java, RefCompanionMethod::class.java.getConstructor(Class::class.java, Field::class.java))
 
             put(RefConstructor::class.java, RefConstructor::class.java.getConstructor(Class::class.java, Field::class.java))
         }

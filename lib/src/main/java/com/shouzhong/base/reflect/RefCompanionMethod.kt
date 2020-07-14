@@ -1,6 +1,5 @@
 package com.shouzhong.base.reflect
 
-import com.blankj.utilcode.util.LogUtils
 import java.lang.reflect.Field
 import kotlin.jvm.internal.Reflection
 import kotlin.reflect.KClass
@@ -8,13 +7,13 @@ import kotlin.reflect.KFunction
 import kotlin.reflect.full.companionObject
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaType
 
 class RefCompanionMethod<T>(cls: Class<*>, field: Field) {
     private val kClass: KClass<*> = Reflection.createKotlinClass(cls)
 
     private val func: KFunction<*> = kClass.companionObject.let {
-        LogUtils.e("--------------")
         val types: Array<Class<*>?>? = when {
             field.isAnnotationPresent(MethodParams::class.java) -> {
                 val value = field.getAnnotation(MethodParams::class.java).value
@@ -40,10 +39,8 @@ class RefCompanionMethod<T>(cls: Class<*>, field: Field) {
             }
             else -> null
         }
-        LogUtils.e("==========")
         var function: KFunction<*>? = null
         for (f in it!!.declaredFunctions!!) {
-            LogUtils.e(f.name)
             if (f.name != field.name) continue
             if (f.parameters.size - 1 != (types?.size ?: 0)) continue
             if (f.parameters.size == 1) {
@@ -52,11 +49,11 @@ class RefCompanionMethod<T>(cls: Class<*>, field: Field) {
             }
             for (i in f.parameters.indices) {
                 if (i == 0) continue
-                val temp = f.parameters[i]
-                if (temp.type.javaType != types!![i - 1]) break
+                if (f.parameters[i].type.javaType != types!![i - 1]) break
                 if (i == f.parameters.size - 1) function = f
             }
         }
+        function?.isAccessible = true
         function!!
     }
 

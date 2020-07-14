@@ -34,6 +34,7 @@
         <activity android:name=".act.PopupActivity" />
         <activity android:name=".act.PermissionActivity" />
         <activity android:name=".act.RequestActivity" />
+        <activity android:name=".act.CoroutinesActivity" />
 
         <service android:name=".TestService" />
     </application>

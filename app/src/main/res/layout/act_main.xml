@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="test"
-            android:onClick="@{vm::onClickTest}"/>
+            android:text="coroutines"
+            android:onClick="@{vm::onClickCoroutines}"/>
     </LinearLayout>
 </layout>
