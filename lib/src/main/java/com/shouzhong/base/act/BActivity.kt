@@ -14,8 +14,7 @@ import com.shouzhong.base.util.initPopup
 import com.shouzhong.bridge.ActivityStack
 
 abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity() {
-    var viewDataBinding: ViewDataBinding? = null
-        private set
+    private var viewDataBinding: ViewDataBinding? = null
     private var vm: T? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,8 +106,9 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
         return vm!!
     }
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? = when(viewDataBinding) {
-        is T -> viewDataBinding as T
-        else -> null
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        viewDataBinding as? T
+    } catch (e: Throwable) {
+        null
     }
 }

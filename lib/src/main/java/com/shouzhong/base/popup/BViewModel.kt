@@ -40,12 +40,11 @@ abstract class BViewModel<T : BPopupBean> : ViewModel(), LifecycleObserver {
 
     fun getLifecycleOwner(): LifecycleOwner = getPopupWindow()
 
-    inline fun <reified T : BPopup<*>> getPopupWindow(): T = FragmentStack.getFragment(uniqueId) as T
+    fun <T : BPopup<*>> getPopupWindow(): T = FragmentStack.getFragment(uniqueId) as T
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? =
-        try {
-            getPopupWindow<BPopup<*>>().getBinding()
-        } catch (e: Throwable) {
-            null
-        }
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        getPopupWindow<BPopup<*>>().getBinding()
+    } catch (e: Throwable) {
+        null
+    }
 }

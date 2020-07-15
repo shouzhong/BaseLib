@@ -17,8 +17,7 @@ import com.shouzhong.bridge.FragmentStack
  *
  */
 open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
-    var viewDataBinding: ViewDataBinding? = null
-        private set
+    private var viewDataBinding: ViewDataBinding? = null
     private var vm: T? = null
 
     var showSwitch: MutableLiveData<Boolean>? = null
@@ -133,8 +132,9 @@ open class BPopup<T : BViewModel<*>>(val layoutId: Int) : PopupFragment() {
         return vm!!
     }
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? = when(viewDataBinding) {
-        is T -> viewDataBinding as T
-        else -> null
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        viewDataBinding as? T
+    } catch (e: Throwable) {
+        null
     }
 }

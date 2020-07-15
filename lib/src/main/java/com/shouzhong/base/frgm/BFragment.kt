@@ -15,8 +15,7 @@ import com.shouzhong.base.util.*
 import com.shouzhong.bridge.FragmentStack
 
 abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
-    var viewDataBinding: ViewDataBinding? = null
-        private set
+    private var viewDataBinding: ViewDataBinding? = null
     private var vm: T? = null
     private var isFirst = false
     private var isFirstVisible = false
@@ -144,8 +143,9 @@ abstract class BFragment<T : BViewModel>(val layoutId: Int) : Fragment() {
         return vm!!
     }
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? = when(viewDataBinding) {
-        is T -> viewDataBinding as T
-        else -> null
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        viewDataBinding as? T
+    } catch (e: Throwable) {
+        null
     }
 }

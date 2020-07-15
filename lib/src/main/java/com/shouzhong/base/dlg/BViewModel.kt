@@ -40,12 +40,11 @@ abstract class BViewModel<T> : ViewModel(), LifecycleObserver {
 
     fun getLifecycleOwner(): LifecycleOwner = getDialog()
 
-    inline fun <reified T : BDialog<*>> getDialog(): T = FragmentStack.getFragment(uniqueId) as T
+    fun <T : BDialog<*>> getDialog(): T = FragmentStack.getFragment(uniqueId) as T
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? =
-        try {
-            getDialog<BDialog<*>>().getBinding()
-        } catch (e: Throwable) {
-            null
-        }
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        getDialog<BDialog<*>>().getBinding()
+    } catch (e: Throwable) {
+        null
+    }
 }

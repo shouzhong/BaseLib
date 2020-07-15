@@ -12,23 +12,28 @@ open class BHolder<T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val data = MutableLiveData<T>()
     var dataList: DataList? = null
         internal set
-    var viewDataBinding: ViewDataBinding? = null
-        internal set
-    var lifecycleOwner: LifecycleOwner? = null
-        internal set
+    internal var viewDataBinding: ViewDataBinding? = null
+    internal var lifecycleOwner: LifecycleOwner? = null
 
     open fun init() = Unit
 
     open fun onBind() = Unit
 
-    inline fun <reified T : BActivity<*>> getActivity(): T? = when (itemView.context) {
-        is T -> itemView.context as T
-        is ContextWrapper -> if ((itemView.context as ContextWrapper).baseContext is T) (itemView.context as ContextWrapper).baseContext as T else null
-        else -> null
+    fun <T : BActivity<*>> getActivity(): T? = try {
+        itemView.context as T
+    } catch (e: Throwable) {
+        try {
+            (itemView.context as ContextWrapper).baseContext as T
+        } catch (e: Throwable) {
+            null
+        }
     }
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? = when(viewDataBinding) {
-        is T -> viewDataBinding as T
-        else -> null
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        viewDataBinding as? T
+    } catch (e: Throwable) {
+        null
     }
+
+    fun getLifecycle(): LifecycleOwner? = lifecycleOwner
 }

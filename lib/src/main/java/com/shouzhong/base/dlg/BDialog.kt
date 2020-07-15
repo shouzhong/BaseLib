@@ -15,8 +15,7 @@ import com.shouzhong.base.util.getGenericClass
 import com.shouzhong.bridge.FragmentStack
 
 abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() {
-    var viewDataBinding: ViewDataBinding? = null
-        private set
+    private var viewDataBinding: ViewDataBinding? = null
     private var vm: T? = null
 
     var showSwitch: MutableLiveData<Boolean>? = null
@@ -131,9 +130,10 @@ abstract class BDialog<T : BViewModel<*>>(val layoutId: Int) : DialogFragment() 
         return vm!!
     }
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? = when(viewDataBinding) {
-        is T -> viewDataBinding as T
-        else -> null
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        viewDataBinding as? T
+    } catch (e: Throwable) {
+        null
     }
 
     open fun initAttributes(attr: WindowManager.LayoutParams?) = Unit

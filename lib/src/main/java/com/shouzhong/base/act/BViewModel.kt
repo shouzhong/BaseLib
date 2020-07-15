@@ -45,12 +45,11 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
 
     fun getLifecycleOwner(): LifecycleOwner = getActivity()
 
-    inline fun <reified T : BActivity<*>> getActivity(): T = ActivityStack.getActivity(uniqueId) as T
+    fun <T : BActivity<*>> getActivity(): T = ActivityStack.getActivity(uniqueId) as T
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? =
-        try {
-            getActivity<BActivity<*>>().getBinding()
-        } catch (e: Throwable) {
-            null
-        }
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        getActivity<BActivity<*>>().getBinding()
+    } catch (e: Throwable) {
+        null
+    }
 }

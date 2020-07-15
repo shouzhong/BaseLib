@@ -46,11 +46,11 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
 
     fun getLifecycleOwner(): LifecycleOwner = getFragment()
 
-    inline fun <reified T : BFragment<*>> getFragment(): T = FragmentStack.getFragment(uniqueId) as T
+    fun <T : BFragment<*>> getFragment(): T = FragmentStack.getFragment(uniqueId) as T
 
-    inline fun <reified T : BActivity<*>> getActivity(): T = getFragment<BFragment<*>>().activity as T
+    fun <T : BActivity<*>> getActivity(): T = getFragment<BFragment<*>>().activity as T
 
-    inline fun <reified T : ViewDataBinding> getBinding(): T? =
+    fun <T : ViewDataBinding> getBinding(): T? =
         try {
             getFragment<BFragment<*>>().getBinding()
         } catch (e: Throwable) {

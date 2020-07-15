@@ -1,16 +1,32 @@
 package com.shouzhong.base.demo.act
 
+import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.demo.R
+import com.shouzhong.base.demo.http.*
 import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 class CoroutinesActivity : BActivity<CoroutinesViewModel>(R.layout.act_coroutines)
 
-class CoroutinesViewModel : BViewModel() {
+class CoroutinesViewModel : BViewModel(), CoroutineScope {
+    private lateinit var job: Job
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        job = Job()
+    }
+
+    override fun onDestroy() {
+        job.cancel()
+    }
+
     fun onClickRunBlocking(v: View) {
         LogUtils.e("主线程id：${Thread.currentThread().id}")
         runBlocking {
@@ -54,6 +70,30 @@ class CoroutinesViewModel : BViewModel() {
             }
             val result = result1.await() + result2.await()
             LogUtils.e(System.currentTimeMillis(), result)
+        }
+    }
+
+    fun onClickRetrofit(v: View) {
+        retrofit<BankCardBean> {
+            api = RetrofitCreator.create(Api::class.java).bankCardInfo(cardNo = "6227002510230145996")
+            onSuccess {
+                LogUtils.e("${it.validated}:${it.bank}")
+            }
+            onFail {
+                LogUtils.e(it?.message)
+            }
+        }
+    }
+
+    fun onClickTask(v: View) {
+        task<String> {
+            apply {
+                delay(1000)
+                return@apply "123"
+            }
+            onSuccess {
+                LogUtils.e(it)
+            }
         }
     }
 
