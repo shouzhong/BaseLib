@@ -8,8 +8,10 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.bridge.FragmentStack
+import kotlinx.coroutines.CoroutineScope
 
 abstract class BViewModel : ViewModel(), LifecycleObserver {
     var uniqueId: String? = null
@@ -50,10 +52,11 @@ abstract class BViewModel : ViewModel(), LifecycleObserver {
 
     fun <T : BActivity<*>> getActivity(): T = getFragment<BFragment<*>>().activity as T
 
-    fun <T : ViewDataBinding> getBinding(): T? =
-        try {
-            getFragment<BFragment<*>>().getBinding()
-        } catch (e: Throwable) {
-            null
-        }
+    fun <T : ViewDataBinding> getBinding(): T? = try {
+        getFragment<BFragment<*>>().getBinding()
+    } catch (e: Throwable) {
+        null
+    }
+
+    fun getScope(): CoroutineScope = viewModelScope
 }

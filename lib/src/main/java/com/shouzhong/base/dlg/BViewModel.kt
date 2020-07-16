@@ -6,7 +6,9 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.shouzhong.bridge.FragmentStack
+import kotlinx.coroutines.CoroutineScope
 
 abstract class BViewModel<T> : ViewModel(), LifecycleObserver {
     var uniqueId: String? = null
@@ -47,4 +49,6 @@ abstract class BViewModel<T> : ViewModel(), LifecycleObserver {
     } catch (e: Throwable) {
         null
     }
+
+    fun getScope(): CoroutineScope = viewModelScope
 }

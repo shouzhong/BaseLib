@@ -5,8 +5,13 @@ import android.view.View
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.shouzhong.base.act.BActivity
+import com.shouzhong.base.dlg.BDialog
+import com.shouzhong.base.frgm.BFragment
+import com.shouzhong.base.popup.BPopup
+import kotlinx.coroutines.CoroutineScope
 
 open class BHolder<T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val data = MutableLiveData<T>()
@@ -36,4 +41,16 @@ open class BHolder<T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     fun getLifecycle(): LifecycleOwner? = lifecycleOwner
+
+    fun getScope(): CoroutineScope? = try {
+        when(lifecycleOwner) {
+            is BActivity<*> -> (lifecycleOwner as BActivity<*>).getVm().getScope()
+            is BFragment<*> -> (lifecycleOwner as BFragment<*>).getVm().getScope()
+            is BDialog<*> -> (lifecycleOwner as BDialog<*>).getVm().getScope()
+            is BPopup<*> -> (lifecycleOwner as BPopup<*>).getVm().getScope()
+            else -> null
+        }
+    } catch (e: Throwable) {
+        null
+    }
 }

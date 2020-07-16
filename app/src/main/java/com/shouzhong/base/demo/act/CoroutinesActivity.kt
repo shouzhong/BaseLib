@@ -1,7 +1,5 @@
 package com.shouzhong.base.demo.act
 
-import android.os.Bundle
-import android.os.Looper
 import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.act.BActivity
@@ -9,24 +7,10 @@ import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.demo.R
 import com.shouzhong.base.demo.http.*
 import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
 class CoroutinesActivity : BActivity<CoroutinesViewModel>(R.layout.act_coroutines)
 
-class CoroutinesViewModel : BViewModel(), CoroutineScope {
-    private lateinit var job: Job
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        job = Job()
-    }
-
-    override fun onDestroy() {
-        job.cancel()
-    }
-
+class CoroutinesViewModel : BViewModel() {
     fun onClickRunBlocking(v: View) {
         LogUtils.e("主线程id：${Thread.currentThread().id}")
         runBlocking {
@@ -49,7 +33,7 @@ class CoroutinesViewModel : BViewModel(), CoroutineScope {
 
     fun onClickSuspend(v: View) {
         LogUtils.e(System.currentTimeMillis())
-        GlobalScope.launch {
+        getScope().launch {
             val token = getToken()
             val userInfo = getUserInfo(token)
             setUserInfo(userInfo)
@@ -61,7 +45,7 @@ class CoroutinesViewModel : BViewModel(), CoroutineScope {
 
     fun onClickAsync(v: View) {
         LogUtils.e(System.currentTimeMillis())
-        GlobalScope.launch {
+        getScope().launch {
             val result1 = GlobalScope.async {
                 getResult1()
             }
@@ -74,8 +58,10 @@ class CoroutinesViewModel : BViewModel(), CoroutineScope {
     }
 
     fun onClickRetrofit(v: View) {
-        retrofit<BankCardBean> {
-            api = RetrofitCreator.create(Api::class.java).bankCardInfo(cardNo = "6227002510230145996")
+        getScope().retrofit<BankCardBean> {
+            api {
+                RetrofitCreator.create(Api::class.java).bankCardInfo(cardNo = "6227002510230145996")
+            }
             onSuccess {
                 LogUtils.e("${it.validated}:${it.bank}")
             }
@@ -86,7 +72,7 @@ class CoroutinesViewModel : BViewModel(), CoroutineScope {
     }
 
     fun onClickTask(v: View) {
-        task<String> {
+        getScope().task<String> {
             apply {
                 delay(1000)
                 return@apply "123"

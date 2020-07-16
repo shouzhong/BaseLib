@@ -17,13 +17,17 @@ class RetrofitCreator {
 }
 
 class RetrofitCoroutineDSL<T> {
-    var api: Call<T>? = null
+    internal var api: (suspend () -> Call<T>)? = null
     internal var onSuccess: ((T) -> Unit)? = null
         private set
     internal var onFail: ((Throwable?) -> Unit)? = null
         private set
     internal var onComplete: (() -> Unit)? = null
         private set
+
+    fun api(block: suspend () -> Call<T>) {
+        this.api = block
+    }
 
     fun onSuccess(block: (T) -> Unit) {
         this.onSuccess = block
@@ -49,7 +53,7 @@ fun <T> CoroutineScope.retrofit(block: RetrofitCoroutineDSL<T>.() -> Unit): Job 
     return this.launch(Dispatchers.Main) {
         val coroutine = RetrofitCoroutineDSL<T>().apply(block)
         var throwable: Throwable? = null
-        coroutine.api?.let { call ->
+        coroutine.api?.invoke()?.let { call ->
             val deferred = async(Dispatchers.IO) {
                 try {
                     call.execute()
@@ -77,7 +81,6 @@ fun <T> CoroutineScope.retrofit(block: RetrofitCoroutineDSL<T>.() -> Unit): Job 
                         coroutine.onFail?.invoke(e)
                     } catch (e: Throwable) { }
                 }
-
             }
             try {
                 coroutine.onComplete?.invoke()

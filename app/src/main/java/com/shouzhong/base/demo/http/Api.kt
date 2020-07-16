@@ -6,7 +6,7 @@ import retrofit2.http.Query
 
 interface Api {
     @GET("validateAndCacheCardInfo.json")
-    fun bankCardInfo(
+    suspend fun bankCardInfo(
         @Query("cardNo") cardNo: String,
         @Query("_input_charset") charset: String = "utf-8",
         @Query("cardBinCheck") check: String = "true"
