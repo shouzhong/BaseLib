@@ -31,6 +31,7 @@ import com.shouzhong.base.popup.BPopupBean
 import com.shouzhong.base.popup.PopupFragment
 import com.shouzhong.base.request.RequestUtils
 import com.shouzhong.bridge.Bridge
+import kotlinx.coroutines.*
 import java.io.File
 import java.lang.reflect.ParameterizedType
 
@@ -382,5 +383,65 @@ private fun toast(
             toast?.setText(s)
         }
         toast?.show()
+    }
+}
+
+class TaskCoroutineDSL<T> {
+    internal var onStart: (() -> Unit)? = null
+    internal var onRequest: (suspend () -> T)? = null
+    internal var onSuccess: ((T) -> Unit)? = null
+        private set
+    internal var onFail: ((Throwable?) -> Unit)? = null
+        private set
+    internal var onComplete: (() -> Unit)? = null
+        private set
+
+    fun onStart(block: () -> Unit) {
+        this.onStart = block
+    }
+
+    fun onRequest(block: suspend () -> T) {
+        this.onRequest = block
+    }
+
+    fun onSuccess(block: (T) -> Unit) {
+        this.onSuccess = block
+    }
+
+    fun onFail(block: (Throwable?) -> Unit) {
+        this.onFail = block
+    }
+
+    fun onComplete(block: () -> Unit) {
+        this.onComplete = block
+    }
+
+    internal fun clear() {
+        onRequest = null
+        onSuccess = null
+        onFail = null
+        onComplete = null
+    }
+}
+
+fun <T> CoroutineScope.task(block: TaskCoroutineDSL<T>.() -> Unit): Job {
+    return this.launch(Dispatchers.Main) {
+        val coroutine = TaskCoroutineDSL<T>().apply(block)
+        try {
+            coroutine.onStart?.invoke()
+            val response = withContext(Dispatchers.IO) {
+                coroutine.onRequest?.invoke()
+            }
+            coroutine.onSuccess?.invoke(response!!)
+        } catch (e: Throwable) {
+            try {
+                coroutine.onFail?.invoke(e)
+            } catch (_: Throwable) {}
+        } finally {
+            try {
+                coroutine.onComplete?.invoke()
+            } catch (_: Throwable) {}
+            coroutine.clear()
+        }
     }
 }

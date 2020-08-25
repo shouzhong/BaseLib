@@ -1,11 +1,13 @@
 package com.shouzhong.base.demo.act
 
 import android.view.View
+import androidx.lifecycle.MutableLiveData
 import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.demo.R
 import com.shouzhong.base.demo.http.*
+import com.shouzhong.base.util.task
 import kotlinx.coroutines.*
 
 class CoroutinesActivity : BActivity<CoroutinesViewModel>(R.layout.act_coroutines)
@@ -24,7 +26,7 @@ class CoroutinesViewModel : BViewModel() {
 
     fun onClickLaunch(v: View) {
         LogUtils.e("主线程id：${Thread.currentThread().id}")
-        val job = GlobalScope.launch {
+        val job = getScope().launch {
             delay(5000)
             LogUtils.e(System.currentTimeMillis(), "协程线程id：${Thread.currentThread().id}")
         }
@@ -46,10 +48,10 @@ class CoroutinesViewModel : BViewModel() {
     fun onClickAsync(v: View) {
         LogUtils.e(System.currentTimeMillis())
         getScope().launch {
-            val result1 = GlobalScope.async {
+            val result1 = async {
                 getResult1()
             }
-            val result2 = GlobalScope.async {
+            val result2 = async {
                 getResult2()
             }
             val result = result1.await() + result2.await()
@@ -58,27 +60,21 @@ class CoroutinesViewModel : BViewModel() {
     }
 
     fun onClickRetrofit(v: View) {
-        getScope().retrofit<BankCardBean> {
-            api {
+        getScope().task<BankCardBean>() {
+            onStart {
+                LogUtils.e("onStart=>开始了")
+            }
+            onRequest {
                 RetrofitCreator.create(Api::class.java).bankCardInfo(cardNo = "6227002510230145996")
             }
             onSuccess {
-                LogUtils.e("${it.validated}:${it.bank}")
+                LogUtils.e("onSuccess=>${it.validated}:${it.bank}")
             }
             onFail {
-                LogUtils.e(it?.message)
+                LogUtils.e("onFail=>${it?.message}/*-")
             }
-        }
-    }
-
-    fun onClickTask(v: View) {
-        getScope().task<String> {
-            apply {
-                delay(1000)
-                return@apply "123"
-            }
-            onSuccess {
-                LogUtils.e(it)
+            onComplete {
+                LogUtils.e("onComplete")
             }
         }
     }

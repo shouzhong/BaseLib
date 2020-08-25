@@ -2,6 +2,7 @@ package com.shouzhong.base.demo.act
 
 import android.view.View
 import androidx.lifecycle.MutableLiveData
+import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.annotation.DialogCancelable
@@ -31,5 +32,13 @@ class DialogViewModel : BViewModel() {
         }
         testDialogCancelable.value = (0..1).random() == 0
         testDialogSwitch.value = true
+    }
+
+    override fun onResume() {
+        LogUtils.e("onResume")
+    }
+
+    override fun onPause() {
+        LogUtils.e("onPause")
     }
 }

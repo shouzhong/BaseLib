@@ -41,11 +41,5 @@
             android:layout_height="wrap_content"
             android:text="retrofit"
             android:onClick="@{vm::onClickRetrofit}"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="task"
-            android:onClick="@{vm::onClickTask}"/>
     </LinearLayout>
 </layout>

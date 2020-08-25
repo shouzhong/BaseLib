@@ -3,6 +3,7 @@ package com.shouzhong.base.demo.act
 import android.view.Gravity
 import android.view.View
 import androidx.lifecycle.MutableLiveData
+import com.blankj.utilcode.util.LogUtils
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.annotation.PopupCancelable
@@ -22,6 +23,14 @@ class PopupViewModel : BViewModel() {
     val testPopupData = TestPopupBean()
     @PopupCancelable(TestPopup::class)
     val testPopupCancelable = MutableLiveData<Boolean>()
+
+    override fun onResume() {
+        LogUtils.e("onResume")
+    }
+
+    override fun onPause() {
+        LogUtils.e("onPause")
+    }
 
     fun onClickLeft(view: View) {
         show(view, PopupFragment.SHOW_STYLE_LEFT)

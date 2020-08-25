@@ -1,18 +1,12 @@
 package com.shouzhong.base.demo.act
 
 import android.content.Intent
-import android.provider.Settings
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.shouzhong.base.act.BActivity
 import com.shouzhong.base.act.BViewModel
 import com.shouzhong.base.demo.R
-import com.shouzhong.base.util.getApp
 import com.shouzhong.base.util.startActivity
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
 
 class MainActivity : BActivity<MainViewModel>(R.layout.act_main)
 

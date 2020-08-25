@@ -30,7 +30,7 @@ class A {
 
 fun a(init: A.() -> Unit) {
     val a = A()
-    init.invoke(a)
+    a.apply(init)
     if (a.s1 == null || a.s2 == null) a.error?.invoke("null")
     else a.success?.invoke("${a.s1}${a.s2}")
 }

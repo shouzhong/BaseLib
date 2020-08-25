@@ -10,5 +10,5 @@ interface Api {
         @Query("cardNo") cardNo: String,
         @Query("_input_charset") charset: String = "utf-8",
         @Query("cardBinCheck") check: String = "true"
-    ) : Call<BankCardBean>
+    ) : BankCardBean
 }

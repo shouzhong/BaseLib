@@ -21,7 +21,7 @@ abstract class BActivity<T : BViewModel>(val layoutId: Int) : AppCompatActivity(
 //        savedInstanceState?.putParcelable("android:support:fragments", null)
         super.onCreate(savedInstanceState)
         viewDataBinding = DataBindingUtil.setContentView(this, layoutId)
-        viewDataBinding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>( 0))?.apply {
+        viewDataBinding?.javaClass?.getDeclaredMethod("setVm", getGenericClass<T>(0))?.apply {
             isAccessible = true
             invoke(viewDataBinding, getVm())
         }
